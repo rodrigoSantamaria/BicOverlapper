@@ -1,0 +1,119 @@
+/**
+ * Entrez2EvalBoolean_queryType.java
+ *
+ * This file was auto-generated from WSDL
+ * by the Apache Axis 1.4 Apr 22, 2006 (06:55:48 PDT) WSDL2Java emitter.
+ */
+
+package gov.nih.nlm.ncbi.www.soap.eutils.efetch;
+
+public class Entrez2EvalBoolean_queryType  implements java.io.Serializable {
+    private gov.nih.nlm.ncbi.www.soap.eutils.efetch.Entrez2BooleanExpType entrez2BooleanExp;
+
+    public Entrez2EvalBoolean_queryType() {
+    }
+
+    public Entrez2EvalBoolean_queryType(
+           gov.nih.nlm.ncbi.www.soap.eutils.efetch.Entrez2BooleanExpType entrez2BooleanExp) {
+           this.entrez2BooleanExp = entrez2BooleanExp;
+    }
+
+
+    /**
+     * Gets the entrez2BooleanExp value for this Entrez2EvalBoolean_queryType.
+     * 
+     * @return entrez2BooleanExp
+     */
+    public gov.nih.nlm.ncbi.www.soap.eutils.efetch.Entrez2BooleanExpType getEntrez2BooleanExp() {
+        return entrez2BooleanExp;
+    }
+
+
+    /**
+     * Sets the entrez2BooleanExp value for this Entrez2EvalBoolean_queryType.
+     * 
+     * @param entrez2BooleanExp
+     */
+    public void setEntrez2BooleanExp(gov.nih.nlm.ncbi.www.soap.eutils.efetch.Entrez2BooleanExpType entrez2BooleanExp) {
+        this.entrez2BooleanExp = entrez2BooleanExp;
+    }
+
+    private java.lang.Object __equalsCalc = null;
+    public synchronized boolean equals(java.lang.Object obj) {
+        if (!(obj instanceof Entrez2EvalBoolean_queryType)) return false;
+        Entrez2EvalBoolean_queryType other = (Entrez2EvalBoolean_queryType) obj;
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (__equalsCalc != null) {
+            return (__equalsCalc == obj);
+        }
+        __equalsCalc = obj;
+        boolean _equals;
+        _equals = true && 
+            ((this.entrez2BooleanExp==null && other.getEntrez2BooleanExp()==null) || 
+             (this.entrez2BooleanExp!=null &&
+              this.entrez2BooleanExp.equals(other.getEntrez2BooleanExp())));
+        __equalsCalc = null;
+        return _equals;
+    }
+
+    private boolean __hashCodeCalc = false;
+    public synchronized int hashCode() {
+        if (__hashCodeCalc) {
+            return 0;
+        }
+        __hashCodeCalc = true;
+        int _hashCode = 1;
+        if (getEntrez2BooleanExp() != null) {
+            _hashCode += getEntrez2BooleanExp().hashCode();
+        }
+        __hashCodeCalc = false;
+        return _hashCode;
+    }
+
+    // Type metadata
+    private static org.apache.axis.description.TypeDesc typeDesc =
+        new org.apache.axis.description.TypeDesc(Entrez2EvalBoolean_queryType.class, true);
+
+    static {
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://www.ncbi.nlm.nih.gov/soap/eutils/efetch", "Entrez2-eval-boolean_queryType"));
+        org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("entrez2BooleanExp");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://www.ncbi.nlm.nih.gov/soap/eutils/efetch", "Entrez2-boolean-exp"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.ncbi.nlm.nih.gov/soap/eutils/efetch", "Entrez2-boolean-expType"));
+        elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+    }
+
+    /**
+     * Return type metadata object
+     */
+    public static org.apache.axis.description.TypeDesc getTypeDesc() {
+        return typeDesc;
+    }
+
+    /**
+     * Get Custom Serializer
+     */
+    public static org.apache.axis.encoding.Serializer getSerializer(
+           java.lang.String mechType, 
+           java.lang.Class _javaType,  
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanSerializer(
+            _javaType, _xmlType, typeDesc);
+    }
+
+    /**
+     * Get Custom Deserializer
+     */
+    public static org.apache.axis.encoding.Deserializer getDeserializer(
+           java.lang.String mechType, 
+           java.lang.Class _javaType,  
+           javax.xml.namespace.QName _xmlType) {
+        return 
+          new  org.apache.axis.encoding.ser.BeanDeserializer(
+            _javaType, _xmlType, typeDesc);
+    }
+
+}
