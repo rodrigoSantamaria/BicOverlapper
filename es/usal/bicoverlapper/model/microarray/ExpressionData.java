@@ -2595,7 +2595,7 @@ public class ExpressionData {
 									,"Error retrieving annotations",
 									JOptionPane.ERROR_MESSAGE);}catch(Exception e){}
 								}});
-							message = "Error retrieving anotations: no Ensembl Mart for organism "+organism;
+							message = "Error retrieving annotations: no Ensembl Mart for organism "+organism;
 							setProgress(100);
 							return null;
 							}
@@ -3293,13 +3293,19 @@ public class ExpressionData {
 			try {
 				levelsi = tr.readTable(new FileInputStream(path)); // lector delimitado de Prefuse (rellena columnas con 0s)
 			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, "Error reading the file: "
-						+ e.getMessage(), "I/O Error",
-						JOptionPane.ERROR_MESSAGE);
+				/*SwingUtilities.invokeLater(new Runnable(){
+					public void run(){
+				
+				
+					JOptionPane.showMessageDialog(null, "Error reading the file: "
+							+ path, "I/O Error",
+							JOptionPane.ERROR_MESSAGE);
+					}});*/
 				message = "Error reading the file: " + e.getMessage();
 				//System.out.println("MicroArrayData en la excepción de error reading the file va a hacer setProgress(progress)="+progress+" y message="+message);
+				System.err.println(message);
 				setProgress(100);
-				return 1;
+				return -1;
 			}
 			if (invert) {
 				numGenes = levelsi.getColumnCount();// Al revï¿½s te lo digo

@@ -6,6 +6,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import prefuse.Constants;
@@ -32,6 +33,8 @@ import prefuse.render.LabelRenderer;
 import prefuse.render.ShapeRenderer;
 import prefuse.util.ColorLib;
 import prefuse.visual.VisualItem;
+
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 
 //Search Panel
@@ -39,6 +42,7 @@ import prefuse.data.query.SearchQueryBinding;
 import prefuse.data.search.SearchTupleSet;
 import prefuse.data.Table;
 import prefuse.util.FontLib;
+import prefuse.util.display.ExportDisplayAction;
 import prefuse.util.ui.JFastLabel;
 import prefuse.util.ui.JSearchPanel;
 import prefuse.util.ui.UILib;
@@ -53,6 +57,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Shape;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -142,6 +147,8 @@ public class BubblesDiagram extends Diagram {
 	private ZoomToFitControl zfc;
 
 	private JFastLabel label;
+
+	private ExportDisplayAction eda;
 
 	/**
 	 * Default constructor
@@ -413,9 +420,10 @@ public class BubblesDiagram extends Diagram {
 		Box box = new Box(BoxLayout.X_AXIS);
 		box.add(Box.createHorizontalStrut(10));
 		box.add(title);
-	//	box.add(Box.createHorizontalGlue());
-	//	box.add(search);
-	//	box.add(Box.createHorizontalStrut(3));
+	
+		
+		eda=new ExportDisplayAction(d);
+		this.registerKeyboardAction(eda, "export display", KeyStroke.getKeyStroke("ctrl P"), WHEN_FOCUSED);
 	
 		this.add(d, BorderLayout.CENTER); // El display con el grafo
 		this.add(box, BorderLayout.SOUTH); // La caja de búsqueda
@@ -642,6 +650,12 @@ public class BubblesDiagram extends Diagram {
 		v.run("filter");
 		v.run("animate");
 	}
+	
+	public void printFigure(File f, int type)
+	{
+	eda.actionPerformed(new ActionEvent(this,43,"export"));
+	}
+
 
 	private static class EdgeColorAction extends ColorAction {
 		static int[] palette = new int[] { ColorLib.gray(0, 123),

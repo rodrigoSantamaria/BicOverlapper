@@ -57,6 +57,7 @@ import es.usal.bicoverlapper.controller.data.filter.GMLFilter;
 import es.usal.bicoverlapper.controller.data.filter.MicroarrayFilter;
 import es.usal.bicoverlapper.controller.data.filter.NetworkTabFileFilter;
 import es.usal.bicoverlapper.controller.data.filter.SyntrenFilter;
+import es.usal.bicoverlapper.controller.data.filter.PNGFileFilter;
 import es.usal.bicoverlapper.controller.data.filter.TextFileFilter;
 import es.usal.bicoverlapper.controller.data.filter.XmlFileFilter;
 import es.usal.bicoverlapper.controller.data.parser.FileParser;
@@ -71,6 +72,8 @@ import es.usal.bicoverlapper.view.configuration.DiagramConfiguration;
 import es.usal.bicoverlapper.view.configuration.WordCloudDiagramConfiguration;
 import es.usal.bicoverlapper.view.configuration.panel.DownloadAEPanel;
 import es.usal.bicoverlapper.view.configuration.panel.DownloadGEOPanel;
+import es.usal.bicoverlapper.view.configuration.panel.SaveFigurePanel;
+import es.usal.bicoverlapper.view.diagram.heatmap2.HeatmapDiagram2;
 import es.usal.bicoverlapper.view.diagram.kegg.KEGGDiagram;
 import es.usal.bicoverlapper.view.diagram.kegg.KEGGDiagramConfiguration;
 import es.usal.bicoverlapper.view.diagram.wordcloud.WordCloudDiagram;
@@ -100,6 +103,7 @@ public class FileMenuManager implements ActionListener, MicroarrayRequester {
 	private Document documento;
 	private AnalysisTask t;
 	private FileMenuManager receiver;
+	public SaveFigurePanel sfp;
 
 	/**
 	 * Constructor to build a MenuManager
@@ -225,6 +229,13 @@ public class FileMenuManager implements ActionListener, MicroarrayRequester {
 				writeSelection(fichero);
 			}
 		}
+		// ------------------- EXPORT Figure ------------------
+				else if (e.getActionCommand().equals("Export Figure")) {
+					//if(sfp==null)
+						sfp=new SaveFigurePanel(this.sesion);
+					
+					sfp.setVisible(true);
+					}
 		// ------------------- SAVE GROUPS ------------------
 				else if (e.getActionCommand().equals("Save Groups...")) {
 					JFileChooser selecFile = new JFileChooser();
@@ -344,11 +355,13 @@ public class FileMenuManager implements ActionListener, MicroarrayRequester {
 		
 		//si no se ha introducido nada el campo solicitado...
 		if(downloadPath == null || downloadPath.equals("") || downloadPath.equals(".txt")){
-			String msgError = "Please introduce an ArrayExpress accession number to download and normalize";
-			JOptionPane.showMessageDialog(
-					null,
-					msgError, "Error",
-					JOptionPane.ERROR_MESSAGE);
+			try{
+				SwingUtilities.invokeLater(new Runnable(){
+					public void run(){
+						String msgError = "Please introduce an ArrayExpress accession number to download and normalize";
+						JOptionPane.showMessageDialog(null,msgError, "Error",JOptionPane.ERROR_MESSAGE);
+					}});}catch(Exception e){e.printStackTrace();}
+				
 			return;
 		}
 		
@@ -367,13 +380,13 @@ public class FileMenuManager implements ActionListener, MicroarrayRequester {
 				apm = new AnalysisProgressMonitor(
 						sesion.getAnalysis(),
 						AnalysisProgressMonitor.AnalysisTask.DOWNLOAD_GEO_MATRIX, p,
-						"Downloading experiment...");
+						"Downloading data...");
 				}
 			else
 				apm = new AnalysisProgressMonitor(
 					sesion.getAnalysis(),
 					AnalysisProgressMonitor.AnalysisTask.DOWNLOAD_MATRIX, p,
-					"Downloading experiment...");
+					"Downloading data...");
 			apm.run();
 			t = apm.getTask();
 			Thread wt = new Thread() {
@@ -381,9 +394,11 @@ public class FileMenuManager implements ActionListener, MicroarrayRequester {
 					try {
 						String fileName = t.get();
 						if (fileName == null) {
-							JOptionPane.showMessageDialog(null,
-									"Experiment cannot be loaded", "Error",
-									JOptionPane.ERROR_MESSAGE);
+							try{
+								SwingUtilities.invokeLater(new Runnable(){
+									public void run(){
+										JOptionPane.showMessageDialog(null, "Experiment cannot be loaded", "Error", JOptionPane.ERROR_MESSAGE);
+									}});}catch(Exception e){e.printStackTrace();}
 							t.message = "Error: experiment cannot be loaded";
 						}
 
@@ -439,6 +454,7 @@ public class FileMenuManager implements ActionListener, MicroarrayRequester {
 			//ventana.getMenuViewKegg().setEnabled(true);
 			
 			ventana.getMenuArchivoExportSelection().setEnabled(true);
+			ventana.getMenuArchivoExportFigure().setEnabled(true);
 			ventana.getMenuViewCloud().setEnabled(true);
 
 			SwingUtilities.invokeLater(new Runnable(){
@@ -829,6 +845,10 @@ public class FileMenuManager implements ActionListener, MicroarrayRequester {
 		return recent;
 	}
 
+	public void printFigure(File file)
+		{
+		sesion.getDiagramWindow("Microarray Heatmap 1").getDiagram().printFigure(file,0);
+		}
 	public void saveSession(String fileName) {
 		try {
 			if (fileName == null)

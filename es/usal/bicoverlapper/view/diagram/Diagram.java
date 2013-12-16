@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 import java.awt.Image;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -533,10 +534,16 @@ public abstract class Diagram extends JPanel {
 	public void update(){};
 	
 	/**
+	 * Given a File and a type, prints the figure to a file
+	 *
+	 */
+	public void printFigure(File f, int type){};
+	/**
 	 * Sets the height of the diagram
 	 * 
 	 * @param h <code>int</code> with diagram's height
 	 */
+	
 	public void setHeight(int h){};
 	
 	/**

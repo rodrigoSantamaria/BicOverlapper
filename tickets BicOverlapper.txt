@@ -5,6 +5,33 @@ D=Discarded (existing but decided not to solve by now, because it's minor or irr
 
 ------------------ PRE 2.0
 
+Exporting figures: 
+	DONE Dialog Box: PNG+EPS options, for all the views.
+	DONE Heatmap: Images are drawn at 2x to make them of higher quality.
+		-> Strange error when saving EPS, sometimes it gets a blank file!
+	DONE Parallel coordinates: Done if 1x, for 2x, detected some resizing issues:
+		Detected error on PC resize, no change of inferior/superior 'cotas' -> done, trasladarScrolls() deprecated by fitScrolls()
+			Still no change if profiles selected
+		Repositioning of scrolls: scrolls modified in resetScrolls and fitScrolls
+			SOLVED fitScrolls fit y axes but not x axes. 
+			Also it sets every limit, not only the new changes, we need a simpler way of doing it
+	DONE Overlapper
+	DONE Word Cloud
+	DONE Network	This is a Prefuse implementation and it's not easy to get the Graphics to pain on. It seems that some people manage to do it with FreeHep
+			SOLVED, but using additional resource ExportDataAction from Prefuse.
+	DONE BubbleMap	SOLVED as with network
+		
+Download GEO: It seems not to work on Ubuntu 12.04, 64 bits, for one of the reviewers. It leads to error reading file, probably the ./, or the curl issue, 
+	Check it and make it clearer on the readme.
+Download GEO: works fine in local, wrong in Virtual Machine and in Mac. In mac, it looks
+	as if using relative pathways (solved). In Virtual Machine there were two causes:
+		1) package curl must be installed in Linux (R library Rcurl, needed by Bioconductor library GEOquery, does not seem to complain about it during install!)
+			If you try to use getGEO on R and get 'sh: 1: curl: not found, then this is the case.
+		2) Comma (,) was used as default decimal separator, instead of point (.) Now solved
+IGNORED PC: scroll back for selection -> will be with ctrl still
+Session: load groups from a different experiment with expression data loaded
+			Now a checking is done and a warning is thrown if necessary, but it allows to load both data anyway.
+
 		DONE Tab delimited microarray document on Load Expression Data. Make it default option and change name
 		DONE Overlapper/BM -> close window when another one is opened (with new groups)
 		Example data:

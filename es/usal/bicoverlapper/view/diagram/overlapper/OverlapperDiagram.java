@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -20,12 +21,17 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,6 +48,9 @@ import es.usal.bicoverlapper.controller.kernel.Session;
 import es.usal.bicoverlapper.controller.manager.configurationManager.ConfigurationMenuManager;
 import es.usal.bicoverlapper.controller.util.Translator;
 import es.usal.bicoverlapper.view.diagram.Diagram;
+
+import net.sf.epsgraphics.ColorMode;
+import net.sf.epsgraphics.EpsGraphics;
 
 //Vector Format Image export
 import org.freehep.util.export.ExportDialog;
@@ -819,6 +828,48 @@ private static final long serialVersionUID = 1L;
 		return this.getPanelParametros();
 		}
 	
+	public void printFigure(File f, int type)
+		{
+		boolean ov=bv.showOverview;
+		boolean op=bv.pauseSimulation;
+		int ow=bv.getWidth();
+		int oh=bv.getHeight();
+		float ofx=bv.offsetX;
+		float ofy=bv.offsetY;
+		bv.offsetX=0;
+		bv.offsetY=0;
+		
+		bv.screenWidth=(int)bv.totalWidth;
+		bv.screenHeight=(int)bv.totalHeight;
+		bv.pauseSimulation=true;
+		
+		bv.showOverview=false;
+		
+		
+		
+		if(type==0)	//for PNG
+			{
+			try {
+				BufferedImage bim= new BufferedImage((int)bv.totalWidth, (int)bv.totalHeight, BufferedImage.TYPE_INT_RGB);
+		        bv.paintComponent(bim.getGraphics());
+			    ImageIO.write(bim, "png", new File(f.getAbsolutePath()));
+	        } catch (IOException e) {e.printStackTrace();}
+			}
+		else 
+			{//for EPS
+			try{
+				Graphics2D eps=new EpsGraphics(f.getName(),new FileOutputStream(f),0,0,(int)bv.totalWidth, (int)bv.totalHeight, ColorMode.COLOR_RGB);
+			    bv.paintComponent(eps);
+				}catch(Exception e){e.printStackTrace(); return;}
+			}
+		
+		bv.resize(ow, oh);
+		bv.offsetX=ofx;
+		bv.offsetY=ofy;
+		bv.showOverview=ov;
+		bv.setDrawingOverview(false);
+		bv.pauseSimulation=op;
+		}
 	
 	public void endConfig(boolean ok){
 		if(!ok)	{configurando=false; return;}
@@ -931,5 +982,8 @@ private static final long serialVersionUID = 1L;
 			bv.update=true;
 			bv.repaint();
 			}
+		
+		
+		
 		}
 	}

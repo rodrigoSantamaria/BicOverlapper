@@ -40,6 +40,7 @@ import es.usal.bicoverlapper.view.analysis.panel.SortPanel;
 import es.usal.bicoverlapper.view.configuration.ConfigurationHandler;
 import es.usal.bicoverlapper.view.configuration.DiagramConfiguration;
 import es.usal.bicoverlapper.view.configuration.WordCloudDiagramConfiguration;
+import es.usal.bicoverlapper.view.configuration.panel.SaveFigurePanel;
 import es.usal.bicoverlapper.view.diagram.bubbles.BubblesDiagram;
 import es.usal.bicoverlapper.view.diagram.heatmap.HeatmapDiagram;
 import es.usal.bicoverlapper.view.diagram.heatmap2.HeatmapDiagram2;
@@ -1285,6 +1286,12 @@ public class Session implements KeyListener{//, FocusListener {
 				sort();// ctrl-S
 			else if (e.getKeyCode() == 48)
 				clear();// ctrl-0
+			else if(e.getKeyCode()==80)// ctrl-P
+				{
+				//if(getMainWindow().getFileMenuManager().sfp==null)
+					this.getMainWindow().getFileMenuManager().sfp=new SaveFigurePanel(this);
+				this.getMainWindow().getFileMenuManager().sfp.setVisible(true);
+				}
 		}
 	}
 
@@ -1388,7 +1395,6 @@ public class Session implements KeyListener{//, FocusListener {
 			if (ArrayUtils.contains(new int[]{es.usal.bicoverlapper.controller.kernel.Configuration.OVERLAPPER_ID, es.usal.bicoverlapper.controller.kernel.Configuration.BUBBLE_MAP_ID}, ventana.getId()))
 				ventana.dispose();
 			}
-
 		}
 
 	/**

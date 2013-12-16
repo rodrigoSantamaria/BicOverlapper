@@ -82,7 +82,7 @@ public class DownloadAEPanel extends javax.swing.JFrame implements
 				getContentPane().add(filePath,
 						new CellConstraints("1, 2, 1, 1, default, default"));
 				filePath.setText("Select a path to store the processed experiment");
-				filePath.setBounds(6, 32, 339, 14);
+				filePath.setBounds(6, 32, 368, 14);
 			}
 			{
 				selectFile = new JButton();
@@ -98,7 +98,7 @@ public class DownloadAEPanel extends javax.swing.JFrame implements
 				getContentPane().add(DownloadButton,
 						new CellConstraints("2, 4, 1, 1, default, default"));
 				DownloadButton.setText("download");
-				DownloadButton.setBounds(381, 77, 86, 21);
+				DownloadButton.setBounds(373, 78, 105, 21);
 				DownloadButton.addActionListener(this);
 
 			}
@@ -107,7 +107,7 @@ public class DownloadAEPanel extends javax.swing.JFrame implements
 				getContentPane().add(Instructions,
 						new CellConstraints("1, 4, 1, 1, default, default"));
 				Instructions.setText("Download + RMA preprocessing");
-				Instructions.setBounds(5, 80, 266, 14);
+				Instructions.setBounds(5, 80, 340, 14);
 			}
 			{
 				jLabel1 = new JLabel();

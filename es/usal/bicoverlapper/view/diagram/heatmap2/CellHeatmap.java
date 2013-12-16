@@ -10,17 +10,29 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
+
+import net.sf.epsgraphics.ColorMode;
+import net.sf.epsgraphics.EpsGraphics;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.DOMImplementation;
 
 import com.sun.tools.internal.ws.processor.generator.Names;
 
@@ -43,18 +55,6 @@ import es.usal.bicoverlapper.view.configuration.panel.HeatmapParameterConfigurat
 import es.usal.bicoverlapper.view.configuration.panel.KeggParameterConfigurationPanel;
 import es.usal.bicoverlapper.view.diagram.overlapper.JProcessingPanel;
 
-
-/*import ch.usi.inf.sape.hac.HierarchicalAgglomerativeClusterer;
-import ch.usi.inf.sape.hac.agglomeration.AgglomerationMethod;
-import ch.usi.inf.sape.hac.agglomeration.CentroidLinkage;
-import ch.usi.inf.sape.hac.agglomeration.CompleteLinkage;
-import ch.usi.inf.sape.hac.agglomeration.WeightedAverageLinkage;
-import ch.usi.inf.sape.hac.dendrogram.Dendrogram;
-import ch.usi.inf.sape.hac.dendrogram.DendrogramBuilder;
-import ch.usi.inf.sape.hac.dendrogram.DendrogramNode;
-import ch.usi.inf.sape.hac.dendrogram.ObservationNode;
-import ch.usi.inf.sape.hac.experiment.DissimilarityMeasure;
-import es.usal.bicoverlapper.controller.kernel.Selection;*/
 
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -114,6 +114,7 @@ public class CellHeatmap extends JProcessingPanel
 	private boolean externalHovering=false;
 	private boolean configurando;
 	private int hoveredCondition;
+	private boolean printing=false;
 	
 	public Selection getSelection()
 		{
@@ -136,7 +137,7 @@ public class CellHeatmap extends JProcessingPanel
 			}
 		numRows=cell.getGenes().size();
 		
-		marginRows=100;
+		marginRows=100*scaleFactor;
 	//	for(Integer i:cell.getGenes())
 	//		{
 	//		String g=vv.md.getGeneName(i);
@@ -145,7 +146,7 @@ public class CellHeatmap extends JProcessingPanel
 			
 		basicWidth=width=marginRows+margin*2+size*numCols;
 		this.height=marginCols+margin*2+size*numRows;
-		int screenHeight=Toolkit.getDefaultToolkit().getScreenSize().height-60;
+		int screenHeight=(Toolkit.getDefaultToolkit().getScreenSize().height-60)*scaleFactor;
 		
 		maxItemsHeight=(int)Math.floor((screenHeight-marginCols-margin*2-(double)titleHeight)/size)-2;
 		
@@ -458,7 +459,8 @@ public class CellHeatmap extends JProcessingPanel
 		gr=bi.createGraphics();
 		RenderingHints qualityHints = new RenderingHints(null);
 		qualityHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		qualityHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+		//qualityHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+		qualityHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		gr.setRenderingHints(qualityHints);
 		
 		fill(vv.session.getBackgroundColor());
@@ -845,4 +847,47 @@ public void mousePressed()
 public void setUpdate(boolean b) {
 	update=true;
 	}
+
+public void scaleUp(int s)
+	{
+	scaleFactor=s;
+	size*=scaleFactor;
+	margin*=scaleFactor;
+	marginCols*=scaleFactor;
+	setSelection(cell);
+	pfont=loadFont("es/usal/bicoverlapper/utils/font/AppleSymbols-28.vlw");//TODO: proportional label sizes 
 	}
+
+public void scaleDown(int s)
+	{
+	size/=s;
+    margin/=s;
+	marginCols/=s;
+	pfont=loadFont("es/usal/bicoverlapper/utils/font/AppleSymbols-14.vlw");
+	scaleFactor/=s;
+    setSelection(cell);
+    }
+
+public void printImage(File f, boolean png)
+	{
+	try {
+		scaleUp(2);
+		update=true;
+		if(png)	//for PNG
+			{
+		        BufferedImage bim= new BufferedImage(this.width, this.height, BufferedImage.TYPE_INT_RGB);
+		        paintComponent(bim.getGraphics());
+	            ImageIO.write(bim, "png", new File(f.getAbsolutePath()));
+	    	}
+		else 
+			{//for EPS
+				Graphics2D eps=new EpsGraphics(f.getName(),new FileOutputStream(f),0,0,this.width,this.height, ColorMode.COLOR_RGB);
+			    paintComponent(eps);
+			}
+		scaleDown(2);
+		}catch(Exception e){e.printStackTrace(); return;}
+			
+	}
+}
+
+

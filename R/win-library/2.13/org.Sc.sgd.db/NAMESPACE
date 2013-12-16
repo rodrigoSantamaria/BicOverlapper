@@ -1,0 +1,16 @@
+import(methods)
+import(AnnotationDbi)
+
+### Only put what is statically exported here. All the AnnObj instances
+### created at load time are dynamically exported (refer to R/zzz.R for
+### the details).
+export(
+    org.Sc.sgd,
+    org.Sc.sgd_dbconn,
+    org.Sc.sgd_dbfile,
+    org.Sc.sgd_dbschema,
+    org.Sc.sgd_dbInfo,
+
+    org.Sc.sgdORGANISM
+)
+

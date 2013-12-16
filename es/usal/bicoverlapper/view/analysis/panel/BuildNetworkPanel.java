@@ -92,7 +92,7 @@ public class BuildNetworkPanel extends javax.swing.JFrame {
 			{
 				sdThreshold = new JTextField();
 				getContentPane().add(sdThreshold);
-				sdThreshold.setText("0.5");
+				sdThreshold.setText("2.5");
 				sdThreshold.setBounds(347, 38, 40, 21);
 			}
 			{
@@ -122,7 +122,7 @@ public class BuildNetworkPanel extends javax.swing.JFrame {
 			{
 				distanceThreshold = new JTextField();
 				getContentPane().add(distanceThreshold);
-				distanceThreshold.setText("1.0");
+				distanceThreshold.setText("1.5");
 				distanceThreshold.setBounds(347, 67, 40, 21);
 			}
 			{

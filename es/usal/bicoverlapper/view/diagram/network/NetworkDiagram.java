@@ -1,13 +1,17 @@
 package es.usal.bicoverlapper.view.diagram.network;
 
+
 import java.awt.BasicStroke;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import prefuse.Constants;
 import prefuse.Display;
@@ -31,6 +35,7 @@ import prefuse.render.LabelRenderer;
 import prefuse.util.ColorLib;
 import prefuse.visual.VisualItem;
 
+import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -41,6 +46,7 @@ import prefuse.data.search.SearchTupleSet;
 import prefuse.data.Table;
 import prefuse.util.FontLib;
 import prefuse.util.collections.IntIterator;
+import prefuse.util.display.ExportDisplayAction;
 import prefuse.util.force.ForceConfigAction;
 import prefuse.util.ui.JFastLabel;
 import prefuse.util.ui.JSearchPanel;
@@ -51,12 +57,19 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import java.beans.PropertyVetoException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 import javax.swing.SwingConstants;
 import javax.swing.BoxLayout;
+
+import net.sf.epsgraphics.ColorMode;
+import net.sf.epsgraphics.EpsGraphics;
 
 import es.usal.bicoverlapper.controller.kernel.Selection;
 import es.usal.bicoverlapper.controller.kernel.Session;
@@ -171,6 +184,8 @@ public class NetworkDiagram extends Diagram {
 	private LinkedList<Integer> selc;
 
 	private JFastLabel title;
+
+	private ExportDisplayAction eda;
 
 	/**
 	 * Default constructor
@@ -308,7 +323,8 @@ public class NetworkDiagram extends Diagram {
 				VisualItem.STROKECOLOR, ePalette);
 		eFill = new DataColorAction("graph.edges", "type", Constants.NOMINAL,
 				VisualItem.FILLCOLOR, ePalette);
-
+		
+		
 		palette=sesion.getExpPalette();
 
 		expressionColor = new ExpressionColorAction("graph.nodes",
@@ -398,13 +414,15 @@ public class NetworkDiagram extends Diagram {
 			currentGenes = new NetworkFocusControl(sesion, "filter",
 					Visualization.FOCUS_ITEMS, v);
 			d.addControlListener(currentGenes); // zoom with vertical right-drag
-
 			// FRAME
 			this.getWindow().add(d);
 		} else
 			d.setVisualization(v);
 
-			title = new JFastLabel("                 ");
+		eda=new ExportDisplayAction(d);
+		this.registerKeyboardAction(eda, "export display", KeyStroke.getKeyStroke("ctrl P"), WHEN_FOCUSED);
+	
+		title = new JFastLabel("                 ");
 		title.setPreferredSize(new Dimension(350, 20));
 		title.setVerticalAlignment(SwingConstants.BOTTOM);
 		title.setBorder(BorderFactory.createEmptyBorder(3, 0, 0, 0));
@@ -564,6 +582,11 @@ public class NetworkDiagram extends Diagram {
 			this.repaint();
 		}
 	}
+	
+	public void printFigure(File f, int type)
+		{
+		eda.actionPerformed(new ActionEvent(this,43,"export"));
+		}
 
 	public void changeLabels() {
 		Iterator it = v.items("graph.nodes");

@@ -1,0 +1,46 @@
+org.Sc.sgd.db           Bioconductor annotation data package
+org.Sc.sgdALIAS         Map Open Reading Frame (ORF) Identifiers to
+                        Alias Gene Names
+org.Sc.sgdCHR           Map ORF IDs to Chromosomes
+org.Sc.sgdCHRLENGTHS    A named vector for the length of each of the
+                        chromosomes
+org.Sc.sgdCHRLOC        ORF IDs to Chromosomal Location
+org.Sc.sgdCOMMON2ORF    Map Between Yeast Common Names and ORF
+                        Identifiers
+org.Sc.sgdDESCRIPTION   An annotation data file that maps Open Reading
+                        Frame (ORF) identifiers to textural
+                        descriptions of the corresponding genes
+org.Sc.sgdENSEMBL       Map Ensembl gene accession numbers with SGD
+                        Gene identifiers
+org.Sc.sgdENSEMBLPROT   Map Ensembl protein acession numbers with SGD
+                        Gene identifiers
+org.Sc.sgdENSEMBLTRANS
+                        Map Ensembl transcript acession numbers with
+                        SGD Gene identifiers
+org.Sc.sgdENTREZID      Map Systematic ORF identifiers with Entrez Gene
+                        identifiers
+org.Sc.sgdENZYME        Map between ORF IDs and Enzyme Commission (EC)
+                        Numbers
+org.Sc.sgdGENENAME      Map between ORF IDs and Genes
+org.Sc.sgdGO            Map between ORF IDs and Gene Ontology (GO)
+org.Sc.sgdGO2ALLORFS    Map Between Gene Ontology (GO) Identifiers and
+                        all ORF Identifiers in the subtree
+org.Sc.sgdINTERPRO      Map Yeast Systematic Names to InterPro IDs
+org.Sc.sgdMAPCOUNTS     Number of mapped keys for the maps in package
+                        org.Sc.sgd.db
+org.Sc.sgdORGANISM      The Organism for org.Sc.sgd
+org.Sc.sgdPATH          Mappings between ORF identifiers and KEGG
+                        pathway identifiers
+org.Sc.sgdPFAM          Map Entrez Gene IDs to Pfam IDs
+org.Sc.sgdPMID          Map between ORF Identifiers and PubMed
+                        Identifiers
+org.Sc.sgdREFSEQ        Map between systematic ORF identifiers and
+                        RefSeq Identifiers
+org.Sc.sgdREJECTORF     Rejected Yeast Genes (ORF)
+org.Sc.sgdSGD           Map Systematic ORF identifiers with SGD
+                        accession numbers
+org.Sc.sgdSMART         Map Yeast ORF Identifiers to SMART IDs
+org.Sc.sgdUNIPROT       Map Uniprot accession numbers with Systematic
+                        ORF identifiers
+org.Sc.sgd_dbconn       Collect information about the package
+                        annotation DB

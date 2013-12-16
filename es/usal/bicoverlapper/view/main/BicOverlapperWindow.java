@@ -51,6 +51,10 @@ public class BicOverlapperWindow extends JFrame {
 	 */
 	private JMenuItem menuArchivoExportSelection;
 	/**
+	 * Menu item to export figures
+	 */
+	private JMenuItem menuArchivoExportFigure;
+	/**
 	 * Menu item to view heatmaps
 	 */
 	private JMenuItem menuViewHeatmap;
@@ -195,6 +199,8 @@ public class BicOverlapperWindow extends JFrame {
 
 		menuArchivoExportSelection = new JMenuItem("Export Selection");
 		fileMenu.add(menuArchivoExportSelection);
+		menuArchivoExportFigure = new JMenuItem("Export Figure");
+		fileMenu.add(menuArchivoExportFigure);
 		menuArchivoSaveGroup = new JMenuItem("Save Groups...");
 		//fileMenu.add(menuArchivoExportSelection);
 		menuArchivoSaveNetwork = new JMenuItem("Save Network...");
@@ -234,6 +240,7 @@ public class BicOverlapperWindow extends JFrame {
 		menuArchivoAbrirBicluster.addActionListener(gestorMenuArchivo);
 
 		menuArchivoExportSelection.addActionListener(gestorMenuArchivo);
+		menuArchivoExportFigure.addActionListener(gestorMenuArchivo);
 		menuArchivoSaveGroup.addActionListener(gestorMenuArchivo);
 		menuArchivoSaveNetwork.addActionListener(gestorMenuArchivo);
 
@@ -452,6 +459,7 @@ public class BicOverlapperWindow extends JFrame {
 		// Inicialmente, todas las vistas están deshabilitadas en lo que no se
 		// carguen los ficheros adecuados
 		menuArchivoExportSelection.setEnabled(false);
+		menuArchivoExportFigure.setEnabled(false);
 		menuArchivoSaveGroup.setEnabled(false);
 		menuArchivoSaveNetwork.setEnabled(false);
 
@@ -655,6 +663,12 @@ public class BicOverlapperWindow extends JFrame {
 	 */
 	public JMenuItem getMenuArchivoExportSelection() {
 		return menuArchivoExportSelection;
+	}
+	/**
+	 * @return the menuArchivoExportFigure
+	 */
+	public JMenuItem getMenuArchivoExportFigure() {
+		return menuArchivoExportFigure;
 	}
 
 	/**

@@ -145,7 +145,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	boolean showResume = true;
 	boolean showUnconnected = false;
 	boolean initialOrdering = false;
-
+	
 	float threshold = 0; // Shows only clusters that fulfill threshold criteria
 	int thresholdType = 0; // depending of this variable, threshold refers to
 							// degree of overlap (0), size of the biclusters (1)
@@ -454,13 +454,6 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	 *            Graphics in which the visualization is to be drawn
 	 */
 	public synchronized void paintComponent(Graphics g) {
-		
-		//System.out.println("update es "+update+", "+started+", "+pauseSimulation);
-		//if((!this.started || pauseSimulation) && !update)	{return;}
-		
-		//System.out.println("Pintando");
-		//update=false;
-		
 		long ts = System.currentTimeMillis();
 		gfinal = (Graphics2D) g;
 		if (g != null && gfinal != null) {
@@ -478,7 +471,8 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 			// Creamos una nueva imagen con el tamaño apropiado
 			if (backBuffer == null && this.getWidth() > 0
 					&& this.getHeight() > 0) {
-				backBuffer = createImage(this.getWidth(), this.getHeight());
+				//backBuffer = createImage(this.getWidth(), this.getHeight());
+				backBuffer = createImage(screenWidth, screenHeight);
 				if (backBuffer != null)
 					gr = ((Graphics2D) backBuffer.getGraphics());
 			}
@@ -498,7 +492,8 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 				Color fg = this.getForeground();
 
 				gr.setColor(bg);
-				gr.fillRect(0, 0, this.getWidth(), this.getHeight());
+				//gr.fillRect(0, 0, this.getWidth(), this.getHeight());
+				gr.fillRect(0, 0, screenWidth, screenHeight);
 				gr.setColor(fg);
 
 				refreshTime = 0;
@@ -1523,7 +1518,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		zoom(-0.1);
 	}
 
-	private void zoom(double f) {
+	void zoom(double f) {
 		totalHeight -= f * totalHeight;
 		totalWidth -= f * totalWidth;
 		zoomFactor += f;

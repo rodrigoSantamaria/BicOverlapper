@@ -1,1 +1,1 @@
-/Users/rodri/Documents/investigacion/distros/bicoverlapper1-4/data/spombe/mata2002no0hLog.txt
+/Users/rodri/Documents/investigacion/publications/BicOverlapper2/imgTests/SyntrenEcoli.txt

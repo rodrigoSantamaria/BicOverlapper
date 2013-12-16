@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.beans.PropertyVetoException;
+import java.io.File;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
@@ -305,4 +306,11 @@ public class HeatmapDiagram2 extends Diagram {
 		this.configurando = false;
 	}
 
+	public void printFigure(File f, int type)
+		{
+		if(type==0)
+			this.v.printImage(f, true);
+		else
+			this.v.printImage(f, false);
+		}
 }

@@ -1,0 +1,2 @@
+Main-Class: es.usal.bicoverlapper.kernel.BicOverlapper
+Class-Path: substance.jar core.jar .

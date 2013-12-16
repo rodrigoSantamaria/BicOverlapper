@@ -16,6 +16,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import es.usal.bicoverlapper.controller.data.fileStructure.FileStructure;
 import es.usal.bicoverlapper.controller.kernel.Session;
@@ -105,9 +106,12 @@ public class GroupsData {
 		cad = br.readLine(); // La primera línea contiene el número de
 								// biclusters
 
+		int matches=0; //to check how many genes of the groups are on expression data, if loaded
+		int matchesc=0; //to check how many conditions of the groups are on expression data, if loaded
 		//antes de comenzar la lectura se restablece la variable
 		sesion.setTooManyGenes(false);
 
+		long t0=System.currentTimeMillis();
 		while ((cad = br.readLine()) != null) {
 			StringTokenizer st = new StringTokenizer(cad, "\t");
 			if (st.countTokens() == 1 && !skipNext) {
@@ -146,7 +150,11 @@ public class GroupsData {
 							}
 							
 							if (!genes.containsKey(c))
+								{
 								genes.put(c, contg++);
+								if(sesion.getMicroarrayData()!=null)
+									if(sesion.getMicroarrayData().getGeneId(c)!=-1)	matches++;
+								}
 						}
 					} else {
 						while (st.hasMoreTokens()) {
@@ -154,7 +162,11 @@ public class GroupsData {
 							b.getConditions().add(c);		
 							//System.out.println(c);
 							if (!conditions.containsKey(c))
+								{
 								conditions.put(c, contc++);
+								if(sesion.getMicroarrayData()!=null)
+									if(sesion.getMicroarrayData().getConditionId(c)!=-1)	matchesc++;
+								}
 						}
 						b.setSize(b.getGenes().size() * b.getConditions().size());
 						if (md == null)
@@ -193,12 +205,33 @@ public class GroupsData {
 			}
 			cont++;
 		}
+		
+		System.out.println("It took "+ (System.currentTimeMillis()-t0)/1000.0+" whith "+matches+" matches");
 		// Ahora tenemos que hacer la proyección
 		if (bubbles.size() > 0) {
 			doProjection();
 			buildGraphFromProjection();
 		} else
 			throw new IOException("No groups found");
+		if(matches!=genes.size())
+			{
+			SwingUtilities.invokeLater(new Runnable(){
+				public void run(){
+				JOptionPane.showMessageDialog(null, "Some group elements are not found on the expression data loaded.", "I/O warning",
+						JOptionPane.WARNING_MESSAGE);
+				}});
+			System.err.println("Some group elements are not found on the expression data loaded.");
+			}
+		if(matchesc!=conditions.size())
+			{
+			SwingUtilities.invokeLater(new Runnable(){
+				public void run(){
+				JOptionPane.showMessageDialog(null, "Some group conditions are not found on the expression data loaded.", "I/O warning",
+						JOptionPane.WARNING_MESSAGE);
+				}});
+			System.err.println("Some group conditions are not found on the expression data loaded.");
+			}
+		
 	}
 
 	/**

@@ -1,0 +1,16 @@
+Package: org.Sc.sgd.db
+Title: Genome wide annotation for Yeast
+Description: Genome wide annotation for Yeast, primarily based on
+        mapping using ORF identifiers from SGD.
+Version: 2.5.0
+Author: Marc Carlson, Seth Falcon, Herve Pages, Nianhua Li
+Maintainer: Biocore Data Team <biocannotation@lists.fhcrc.org>
+Depends: R (>= 2.7.0), methods, AnnotationDbi (>= 1.13.17)
+Suggests: annotate
+Imports: methods, AnnotationDbi
+License: Artistic-2.0
+organism: Saccharomyces cerevisiae
+species: Yeast
+biocViews: AnnotationData, Saccharomyces_cerevisiae
+Packaged: 2011-03-23 18:03:52 UTC; mcarlson
+Built: R 2.13.0; ; 2011-04-22 19:21:36 UTC; windows

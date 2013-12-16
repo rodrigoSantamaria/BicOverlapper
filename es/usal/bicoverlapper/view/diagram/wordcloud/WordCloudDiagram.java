@@ -13,9 +13,12 @@ import java.awt.event.MouseListener;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
+import javax.imageio.ImageIO;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -32,6 +36,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import net.sf.epsgraphics.ColorMode;
+import net.sf.epsgraphics.EpsGraphics;
 
 import es.usal.bicoverlapper.controller.analysis.Analysis;
 import es.usal.bicoverlapper.controller.analysis.AnalysisProgressMonitor;
@@ -690,7 +697,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 		qualityHints.put(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		qualityHints.put(RenderingHints.KEY_RENDERING,
-				RenderingHints.VALUE_RENDER_SPEED);
+				RenderingHints.VALUE_RENDER_QUALITY);
 		g2.setRenderingHints(qualityHints);
 
 		//System.out.println("Drawing words");
@@ -1029,10 +1036,6 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 	}
 
 	public void mousePressed(MouseEvent e) {
-		// if
-		// (!this.myColor.equals(this.sesion.getDataLayer().getSelectedTupleColor())){
-		// this.colorSeleccion=this.myColor;
-		// this.sesion.getDataLayer().setSelectionColor(this.colorSeleccion);
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -1164,6 +1167,35 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 		sesion.updateConfigExcept(this.getName());
 		this.update();
 	}
+	
+	public void printFigure(File f, int type)
+		{
+		this.setBounds(this.getX(), this.getY(), this.getWidth()*2, this.getHeight()*2);
+		textChanged=true;
+		
+		if(type==0)	//for PNG
+			{
+			try {
+				BufferedImage bim= new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+				paintComponent(bim.getGraphics());
+				paintComponent(bim.getGraphics());
+		        ImageIO.write(bim, "png", new File(f.getAbsolutePath()));
+	        } catch (IOException e) {e.printStackTrace();}
+			}
+		else 
+			{//for EPS
+			try{
+				Graphics2D eps=new EpsGraphics(f.getName(),new FileOutputStream(f),0,0,this.getWidth(), this.getHeight(), ColorMode.COLOR_RGB);
+				paintComponent(eps);
+				paintComponent(eps);
+				}catch(Exception e){e.printStackTrace(); return;}
+			}
+		
+		this.setBounds(this.getX(), this.getY(), this.getWidth()/2, this.getHeight()/2);
+		textChanged=true;
+		update();
+		}
+
 
 	private class Word {
 		private TextLayout text;

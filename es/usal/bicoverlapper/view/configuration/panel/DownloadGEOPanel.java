@@ -101,7 +101,7 @@ public class DownloadGEOPanel extends javax.swing.JFrame implements ActionListen
 				DownloadButton = new JButton();
 				getContentPane().add(DownloadButton, new CellConstraints("2, 4, 1, 1, default, default"));
 				DownloadButton.setText("download");
-				DownloadButton.setBounds(381, 108, 88, 23);
+				DownloadButton.setBounds(362, 108, 116, 23);
 				DownloadButton.addActionListener(this);
 				
 			}
@@ -116,7 +116,7 @@ public class DownloadGEOPanel extends javax.swing.JFrame implements ActionListen
 				logScale = new JCheckBox();
 				getContentPane().add(logScale);
 				logScale.setText("Perform log scale transform");
-				logScale.setBounds(6, 75, 200, 19);
+				logScale.setBounds(6, 75, 307, 19);
 			}
 			{
 				jLabel2 = new JLabel();
