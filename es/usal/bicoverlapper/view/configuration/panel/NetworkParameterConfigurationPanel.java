@@ -1,16 +1,12 @@
 package es.usal.bicoverlapper.view.configuration.panel;
 
 import java.awt.Dimension;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 
 import javax.swing.WindowConstants;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
 
 
 import prefuse.action.layout.graph.ForceDirectedLayout;
