@@ -84,6 +84,23 @@ public class ArrayUtils {
 		return intArray;
 		}
 	
+	/**
+	* Converts an array of Integer objects to an array of integer primitives
+	*
+	* @param list the integer list
+	*
+	* @return an array of integer primitives
+	*/
+	public static String[] toStringArray(List<String> list) 
+		{
+		String[] array = new String[list.size()];
+		for (int i = 0; i < list.size(); i++) 
+			{
+			array[i] = list.get(i);
+			}
+		return array;
+		}
+	
 	public static String chopArray(String text, int maxWords, String sep)
 		{
 		String text2="";

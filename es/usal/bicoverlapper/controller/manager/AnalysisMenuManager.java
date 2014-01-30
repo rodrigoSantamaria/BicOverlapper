@@ -218,7 +218,7 @@ public class AnalysisMenuManager implements ActionListener {
 				// else selectPanel.updateLists();
 				selectPanel.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 				selectPanel.setTitle("Select Profiles");
-				selectPanel.setAlwaysOnTop(true);
+				//selectPanel.setAlwaysOnTop(true);
 
 				// Display the window.
 				selectPanel.pack();
@@ -231,7 +231,7 @@ public class AnalysisMenuManager implements ActionListener {
 				// else selectPanel.updateLists();
 				difExpPanel.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 				difExpPanel.setTitle("Differential Expression Analysis");
-				difExpPanel.setAlwaysOnTop(true);
+				//difExpPanel.setAlwaysOnTop(true);
 				difExpPanel.setLocation(
 						(sesion.getDesktop().getWidth() - difExpPanel
 								.getWidth()) / 2, (sesion.getDesktop()
@@ -248,7 +248,7 @@ public class AnalysisMenuManager implements ActionListener {
 				// else selectPanel.updateLists();
 				buildNetPanel.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 				buildNetPanel.setTitle("Build Correlation Network");
-				buildNetPanel.setAlwaysOnTop(true);
+				//buildNetPanel.setAlwaysOnTop(true);
 				buildNetPanel.setLocation(
 						(sesion.getDesktop().getWidth() - buildNetPanel
 								.getWidth()) / 2, (sesion.getDesktop()

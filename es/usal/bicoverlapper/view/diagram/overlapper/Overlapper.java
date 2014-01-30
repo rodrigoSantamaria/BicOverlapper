@@ -2255,6 +2255,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		conditionNames = new ArrayList<String>();
 
 		for (int l = 2; l < data.length; l++) {
+			System.out.println("group:\t"+data[l]);
 			dataToken = data[l].split(delimiter);// Filas
 			String groupName = "" + cont;
 			if (groupDelimiter != null && data[l].contains(groupDelimiter))
@@ -2262,6 +2263,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 
 			if (dataToken.length > 1) {
 				l++;
+				System.out.println("rows: "+data[l]);
 				dataToken = data[l].split(delimiter);// Filas
 				ArrayList<String> lista = new ArrayList<String>();
 				if (!onlyConditions) {
@@ -2272,6 +2274,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 					}
 				}
 				l++;
+				System.out.println("columns: "+data[l]);
 				dataToken = data[l].split(delimiter); // Columnas
 				if (dataToken.length > 1) {
 					if (!onlyGenes) {

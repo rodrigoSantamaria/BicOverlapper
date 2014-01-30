@@ -15,6 +15,7 @@ import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RList;
 import org.rosuda.JRI.Rengine;
 
+import es.usal.bicoverlapper.controller.util.ArrayUtils;
 import es.usal.bicoverlapper.model.annotations.GOTerm;
 import es.usal.bicoverlapper.model.microarray.ExpressionData;
 import es.usal.bicoverlapper.utils.RUtils;
@@ -1156,6 +1157,101 @@ public class Analysis {
 		exp = r.eval("writeBiclusterResultsFromList(\"" + outFile
 				+ "\", lr, NA, bicNames=c(\"" + nameGroup1 + " vs "
 				+ nameGroup2 + "\"), biclusteringDescription=\"" + desc + "\")");
+		return outFile;
+	}
+
+	/**
+	 * As limma above, but instead of Experimental Factor + 2 experimental factor values we just have column names (it will help to combine EFVs, or to use just column names)
+	 * @param names1 list of sample names
+	 * @param names2 list of sample names
+	 * @param bh
+	 * @param pvalue
+	 * @param elevel
+	 * @param reg
+	 * @param outFile
+	 * @param description
+	 * @return
+	 */
+	public String limmaSampleNames(ArrayList<String> names1, ArrayList<String> names2,
+			String groupName1, String groupName2, boolean bh, double pvalue, double elevel, String reg,
+			String outFile, String description) {
+		String m = this.microarrayData.rMatrixName;
+		if (!matrixLoaded)
+			loadMatrix(m);
+		loadBioconductorLibrary("limma");
+		//0) Build singular ef as (other, other, other, ...group1, group1, ... group2, group2)
+		
+		
+		exp = r.eval("source(\"es/usal/bicoverlapper/source/codeR/difAnalysis.R\")");
+		if(names1.size()<2 || names2.size()<2)
+			{
+			System.err.println("Error, not enough replicates on group1 or group2");
+			JOptionPane.showMessageDialog(null, "Differential expression cannot be done. Experimental factors must have two or more replicates.", "Error", JOptionPane.ERROR_MESSAGE);
+			return null;
+			}
+		
+		ArrayList<String> cond=new ArrayList<String>();
+		for(String s:this.getMicroarrayData().getConditionNames())
+			if(names1.contains(s))		cond.add(groupName1);
+			else if(names2.contains(s))	cond.add(groupName2);
+			else						cond.add("other");
+		
+		System.out.println("degs=diffAnalysis(exprs(" + m + "), g="
+				+ RUtils.getRList(ArrayUtils.toStringArray(cond))
+				+ ", g1=\""+groupName1+"\", g2=\""+groupName2+"\", "
+				+ "pvalT=" + pvalue + ", diffT=" + elevel + ", byRank=FALSE, "
+				+ "numRank=50, return =\"" + reg + "\")");
+
+		exp = r.eval("degs=diffAnalysis(exprs(" + m + "), g="
+				+ RUtils.getRList(ArrayUtils.toStringArray(cond))
+				+ ", g1=\""+groupName1+"\", g2=\""+groupName2+"\", "
+				+ "pvalT=" + pvalue + ", diffT=" + elevel + ", byRank=FALSE, "
+				+ "numRank=50, return =\"" + reg + "\")");
+		if (exp == null) {
+			System.out.println("Error, cannot perform differential expression analysis");
+			return null;
+		}
+
+		if(r.eval("length(degs)").asInt()==0)
+			{
+			System.err.println("Error, no differentially expressed genes found");
+			JOptionPane.showMessageDialog(null, "No differentially expressed genes found under current settings.", "Error", JOptionPane.ERROR_MESSAGE);
+			return null;
+			}
+		exp = r.eval("lr=list(featureNames(" + m + ")[degs])");
+
+		if (outFile.length() == 0) // tempfile
+		{
+			outFile = "limma" + (int) (100000 * Math.random()) + ".tmp";
+		} else {
+			if (!outFile.contains(".")) // automatic name
+			{
+				outFile = outFile.replace("\\", "/");
+				if (!outFile.endsWith("\\") && !outFile.endsWith("/"))
+					outFile = outFile.concat("/");
+				outFile = outFile.replace(".", "-");
+				outFile = outFile.concat(".bic");
+			}
+		}
+		String status = "under- or over-";
+		if (reg.equals("up"))
+			status = "over-";
+		if (reg.equals("down"))
+			status = "under-";
+		String desc = "Differentially " + status
+				+ "expressed genes found with limma in group1"
+				+ " respect to group2 (dexp=" + elevel
+				+ ", p-val=10e-" + pvalue;
+		if (!bh)
+			desc += ")";
+		else
+			desc += " (BH corrected))";
+		if (description != null && description.length() > 0)
+			desc = description;
+
+		exp = r.eval("writeBiclusterResultsFromList(\"" + outFile
+				+ "\", lr, NA, bicNames=c(\""+groupName1+" vs "
+				+ groupName2+"\"), biclusteringDescription=\"" + desc + "\")");
 		return outFile;
 	}
 

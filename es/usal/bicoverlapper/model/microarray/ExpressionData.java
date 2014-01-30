@@ -371,6 +371,24 @@ public class ExpressionData {
 	public String[] getExperimentFactorValues(String experimentFactor) {
 		return this.experimentFactorValues.get(experimentFactor);
 	}
+	
+	/**
+	 * Returns the condition names that are labelled with one of the input value(s) for the given experiment factor
+	 * @param experimentFactorValue
+	 * @return
+	 */
+	public ArrayList<String> getConditionNames(String experimentFactor, ArrayList<String> values)
+		{
+		ArrayList<String> cn=new ArrayList<String>();
+		String[] efvs = experimentFactorValues.get(experimentFactor);
+		for(int i=0;i<efvs.length;i++)
+			{
+			for(String s:values)
+				if(s.equals(efvs[i]))
+					cn.add(conditionNames[i]);
+			}
+		return cn;
+		}
 
 	/**
 	 * Sets the table geneLabels and conditionLabels to fit with rowLabels and

@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
@@ -18,6 +20,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
 import es.usal.bicoverlapper.controller.analysis.Analysis;
@@ -84,6 +87,7 @@ public class DiffExpPanel extends javax.swing.JFrame {
 			this.setPreferredSize(new java.awt.Dimension(497, 490));
 			getContentPane().setLayout(null);
 			this.setSize(497, 490);
+			this.setAlwaysOnTop(false);
 			// this.setToolTipText("Limma differential expression analysis between groups 1 and 2.\r\nThe genes above the thresholds are selected.");
 			{
 				OK = new JButton();
@@ -122,9 +126,14 @@ public class DiffExpPanel extends javax.swing.JFrame {
 						//NO GROUP SELECTED
 						if (null == group1.getSelectedValue()
 								|| null == group2.getSelectedValue()) {
-							String msgError = "There is no information about experimental factor in the expression file, so no differential expression analysis can be done. Please add this information as described in the help (format section).";
-							JOptionPane.showMessageDialog(null, msgError,
-									"Error", JOptionPane.ERROR_MESSAGE);
+							try{
+								SwingUtilities.invokeLater(new Runnable(){public void run(){
+									String msgError = "There is no information about experimental factor in the expression file, so no differential expression analysis can be done. Please add this information as described in the help (format section).";
+									JOptionPane.showMessageDialog(null, msgError,
+											"Error", JOptionPane.ERROR_MESSAGE);
+									}});
+								}catch(Exception ex){ex.printStackTrace();}
+							
 							return;
 						}
 
@@ -132,21 +141,20 @@ public class DiffExpPanel extends javax.swing.JFrame {
 						String g2 = group2.getSelectedValue().toString();
 
 						//BOTH EFs
-						if (!g1.startsWith(" ") && !g2.startsWith(" ") && !g1.equals("rest") && !g2.equals("rest"))// both
-																		// are
-																		// efs
-						{
-							if (!g1.equals(g2))// 8)
+						if (!g1.startsWith(" ") && !g2.startsWith(" ") && !g1.equals("rest") && !g2.equals("rest"))// both are efs
 							{
-								JOptionPane
-										.showMessageDialog(
-												null,
-												"Experimental factors (efs) cannot be compared, choose ef values or the same ef",
-												"Error",
-												JOptionPane.ERROR_MESSAGE);
-								return;
+								if (!g1.equals(g2))// 8)
+								{
+									try{
+										SwingUtilities.invokeLater(new Runnable(){public void run(){
+											JOptionPane.showMessageDialog(null,
+													"Different experimental factors (EFs) cannot be compared.\n Please choose the same EF or EF values from the same EF",
+													"Error", JOptionPane.ERROR_MESSAGE);
+											}});
+										}catch(Exception ex){ex.printStackTrace();}
+									return;
+								}
 							}
-						}
 						
 						//EF1 is REST
 						if (g1.equals("rest")) {
@@ -229,70 +237,24 @@ public class DiffExpPanel extends javax.swing.JFrame {
 						Analysis b = session.getAnalysis();
 						b.setFilterOptions(null);
 
-						//EVERY COMBINATION OF AN EF
-						if (!ef1.equals("rest") && ef1.equals(ef2)
-								&& efv1.equals(efv2)) {
-								// 7) Same ef, do every possible combination
-								System.out.println("Same EF case");
-								ArrayList<Object> p = new ArrayList<Object>();
-								p.add(ef1);
-								p.add(true);
-								p.add(new Double(pvalueValue.getText())
-										.doubleValue());
-								p.add(new Double(expressionValue.getText())
-										.doubleValue());
-								p.add(reg);
-								p.add(fileName);
-								p.add(description.getText());
-	
-								AnalysisProgressMonitor apm = new AnalysisProgressMonitor(
-										b,
-										AnalysisProgressMonitor.AnalysisTask.LIMMAEFALL,
-										p);
-								apm.run();
-								t = apm.getTask();
-								Thread wt = new Thread() {
-									public void run() {
-										try {
-											String fileName = t.get();
-											if (fileName == null)
-												JOptionPane
-														.showMessageDialog(
-																null,
-																"No differentially expressed genes found",
-																"Error",
-																JOptionPane.ERROR_MESSAGE);
-	
-											else {
-												session.getMainWindow().getFileMenuManager().readGroups(new File(fileName).getAbsolutePath(), new File(fileName), session);
-											}
-										} catch (Exception e) {
-											e.printStackTrace();
-										}
-									}
-								};
-								wt.start();
-								setVisible(false);
-								
-						
-						//REST vs REST (deprecated as all the rest cases)
-						} else if (ef1.equals("rest") && ef2.equals(ef1)) {// case
-																			// 1,
-																			// rest
-																			// vs
-																			// rest,
-																			// perform
-																			// diffexp
-																			// between
-																			// every
-																			// combination
-																			// of
-																			// efvs
-																			// for
-																			// each
-																			// ef
-							System.out.println("rest vs rest case");
+						//--------------------------------------------------
+						//----------    1 EVERY COMBINATION OF AN EF -------
+						//--------------------------------------------------
+						if (ef1.equals(ef2) && efv1.equals(efv2)) 
+							{
+							// 7) Same ef, do every possible combination
+							System.out.println("Same EF case");
+							if (ef1.equals("Sample names"))
+								{
+								try{
+									SwingUtilities.invokeLater(new Runnable(){public void run(){
+										JOptionPane.showMessageDialog(null, "General selection is only allowed on Experimental Factors with replicates.\nFor Sample names, please select two or more names for each group", "Error", JOptionPane.ERROR_MESSAGE);
+										}});
+									}catch(Exception ex){ex.printStackTrace();}
+								return;
+							}
 							ArrayList<Object> p = new ArrayList<Object>();
+							p.add(ef1);
 							p.add(true);
 							p.add(new Double(pvalueValue.getText())
 									.doubleValue());
@@ -304,7 +266,7 @@ public class DiffExpPanel extends javax.swing.JFrame {
 
 							AnalysisProgressMonitor apm = new AnalysisProgressMonitor(
 									b,
-									AnalysisProgressMonitor.AnalysisTask.LIMMAALL,
+									AnalysisProgressMonitor.AnalysisTask.LIMMAEFALL,
 									p);
 							apm.run();
 							t = apm.getTask();
@@ -313,14 +275,15 @@ public class DiffExpPanel extends javax.swing.JFrame {
 									try {
 										String fileName = t.get();
 										if (fileName == null)
-											JOptionPane.showMessageDialog(null,
-													"No groups found",
-													"Error",
-													JOptionPane.ERROR_MESSAGE);
-
-										else {
-											session.getMainWindow().getFileMenuManager().readGroups(new File(fileName).getAbsolutePath(), new File(fileName), session);
-										}
+											{
+											try{
+												SwingUtilities.invokeLater(new Runnable(){public void run(){
+													JOptionPane.showMessageDialog(null,"No differentially expressed genes found","Error",JOptionPane.ERROR_MESSAGE);
+													}});
+												}catch(Exception e){e.printStackTrace();}
+											return;
+											}
+										else session.getMainWindow().getFileMenuManager().readGroups(new File(fileName).getAbsolutePath(), new File(fileName), session);
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
@@ -328,31 +291,35 @@ public class DiffExpPanel extends javax.swing.JFrame {
 							};
 							wt.start();
 							setVisible(false);
-							
-							
+							}
+						
+						//--------------------------------------------------
+						//----------    2 One EFV against the rest of EFVs of a single EF -------
+						//--------------------------------------------------
 						//EF vs EFV
-						} else if (!efv1.equals("rest") && !efv2.equals("rest")
+						else if (!efv1.equals("rest") && !efv2.equals("rest") && !efv1.equals("Sample names") && !efv2.equals("Sample names")
 								&& (efv1.equals(ef1) || efv2.equals(ef2))
 								&& ef1.equals(ef2))// same ef, not rest
-						{ // TODO: 4b, 5, 6
+							{ // TODO: 4b, 5, 6
 							System.out.println("EF vs EFV case");
 							String ef = null, efv = null;
-							if (efv1.equals(ef1)) {
+							if (efv1.equals(ef1)) 
+								{
 								ef = ef1;
 								efv = efv2;
-							} else if (efv2.equals(ef2)) {
+								}
+							else if (efv2.equals(ef2)) 
+								{
 								ef = ef2;
 								efv = efv1;
-							}
+								}
 
 							ArrayList<Object> p = new ArrayList<Object>();
 							p.add(ef);
 							p.add(efv);
 							p.add(true);
-							p.add(new Double(pvalueValue.getText())
-									.doubleValue());
-							p.add(new Double(expressionValue.getText())
-									.doubleValue());
+							p.add(new Double(pvalueValue.getText()).doubleValue());
+							p.add(new Double(expressionValue.getText()).doubleValue());
 							p.add(reg);
 							p.add(fileName);
 							p.add(description.getText());
@@ -368,11 +335,14 @@ public class DiffExpPanel extends javax.swing.JFrame {
 									try {
 										String fileName = t.get();
 										if (fileName == null)
-											JOptionPane.showMessageDialog(null,
-													"No groups found",
-													"Error",
-													JOptionPane.ERROR_MESSAGE);
-
+											{
+											try{
+												SwingUtilities.invokeLater(new Runnable(){public void run(){
+													JOptionPane.showMessageDialog(null, "No groups found", "Error", JOptionPane.ERROR_MESSAGE);
+													}});
+												}catch(Exception e){e.printStackTrace();}
+											return;
+											}
 										else {
 											session.getMainWindow().getFileMenuManager().readGroups(new File(fileName).getAbsolutePath(), new File(fileName), session);
 										}
@@ -383,11 +353,15 @@ public class DiffExpPanel extends javax.swing.JFrame {
 							};
 							wt.start();
 							setVisible(false);
+							}
 							
+						//--------------------------------------------------
+						//----------    3 Just two EFVs comparison   -------
+						//--------------------------------------------------
 						//EFV vs EFV
 						//TODO: distinguish between multiple EFVs select or just one against one.
 						//TODO: decide about rest, right now rest vs EF or EFV is coming here
-						} else {
+						else {
 							if(group1.getSelectedIndices().length==1 && group2.getSelectedIndices().length==1)	//take them as single EFVs and take confidence on replicates for them
 							{	
 							// 3,4) ---------------- EFVs case
@@ -427,11 +401,14 @@ public class DiffExpPanel extends javax.swing.JFrame {
 									try {
 										String fileName = t.get();
 										if (fileName == null)
-											JOptionPane.showMessageDialog(null,
-													"No groups found",
-													"Error",
-													JOptionPane.ERROR_MESSAGE);
-
+											{
+											try{
+												SwingUtilities.invokeLater(new Runnable(){public void run(){
+													JOptionPane.showMessageDialog(null, "No groups found", "Error", JOptionPane.ERROR_MESSAGE);
+													}});
+												}catch(Exception e){e.printStackTrace();}
+											return;
+											}
 										else {
 											session.getMainWindow().getFileMenuManager().readGroups(new File(fileName).getAbsolutePath(), new File(fileName), session);
 											}
@@ -443,11 +420,159 @@ public class DiffExpPanel extends javax.swing.JFrame {
 							wt.start();
 							setVisible(false);
 						}
-							else
+						//--------------------------------------------------
+						//----------    4 Sample names as replicates -------
+						//--------------------------------------------------
+						else if(ef1.equals("Sample names") && ef2.equals("Sample names"))
+							{
+							// 3,4) ---------------- EFVs case
+							System.out.println("Sample names case");
+							if(group1.getSelectedIndices().length<2 || group2.getSelectedIndices().length<2)
 								{
+								try{
+									SwingUtilities.invokeLater(new Runnable(){public void run(){
+										JOptionPane.showMessageDialog(null, "Differential expression requires two or more replicates on each group.\n Please select several sample names for each group.", "Error", JOptionPane.ERROR_MESSAGE);
+										}});
+									}catch(Exception ex){ex.printStackTrace();}
+								return;
+								}
+							ArrayList<Object> p = new ArrayList<Object>();
+							ArrayList<String> sg1=new ArrayList<String>();
+							for(int i=0; i<group1.getSelectedValues().length;i++)
+								sg1.add(((String)group1.getSelectedValues()[i]).trim());
+							ArrayList<String> sg2=new ArrayList<String>();
+							for(int i=0; i<group2.getSelectedValues().length;i++)
+								sg2.add(((String)group2.getSelectedValues()[i]).trim());
+							
+							p.add(sg1);
+							p.add(sg2);
+							p.add("Group 1");
+							p.add("Group 2");
+							p.add(true);
+							p.add(new Double(pvalueValue.getText())
+									.doubleValue());
+							p.add(new Double(expressionValue.getText())
+									.doubleValue());
+							p.add(reg);
+							p.add(fileName);
+							p.add(description.getText());
+
+							AnalysisProgressMonitor apm = new AnalysisProgressMonitor(
+									b,
+									AnalysisProgressMonitor.AnalysisTask.LIMMASAMPLES,
+									p);
+							apm.run();
+							t = apm.getTask();
+							Thread wt = new Thread() {
+								public void run() {
+									try {
+										String fileName = t.get();
+										if (fileName == null)
+											{
+											try{
+												SwingUtilities.invokeLater(new Runnable(){public void run(){
+													JOptionPane.showMessageDialog(null, "No groups found", "Error", JOptionPane.ERROR_MESSAGE);
+													}});
+												}catch(Exception e){e.printStackTrace();}
+											return;
+											}
+										else {
+											session.getMainWindow().getFileMenuManager().readGroups(new File(fileName).getAbsolutePath(), new File(fileName), session);
+											}
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+							};
+							wt.start();
+							setVisible(false);
+							}
+						//--------------------------------------------------
+						//----------    5 Same as 3 but taking several EFVs on each side -------
+						//--------------------------------------------------
+						else if(ef1.equals(ef2))
+							{
+							System.out.println("EFV(s) vs EFV(s) case");
+							
+							ArrayList<Object> p = new ArrayList<Object>();
+							ArrayList<String> sg1=new ArrayList<String>();
+							String ng1="", ng2="";
+							for(Object o:group1.getSelectedValues())
+								{
+								String s=((String)o).trim();
+								sg1.add(s);
+								ng1+=s+", ";
+								}
+							ng1=ng1.substring(0, ng1.length()-2);
+							ArrayList<String> sg2=new ArrayList<String>();
+							for(Object o:group2.getSelectedValues())
+								{
+								String s=((String)o).trim();
+								sg2.add(s);
+								ng2+=s+", ";
+								}
+							ng2=ng2.substring(0, ng2.length()-2);
+							ArrayList<String> cn1=session.getMicroarrayData().getConditionNames(ef1, sg1);
+							ArrayList<String> cn2=session.getMicroarrayData().getConditionNames(ef2, sg2);
+							
+							p.add(cn1);
+							p.add(cn2);
+							p.add(ng1);
+							p.add(ng2);
+							p.add(true);
+							p.add(new Double(pvalueValue.getText())
+									.doubleValue());
+							p.add(new Double(expressionValue.getText())
+									.doubleValue());
+							p.add(reg);
+							p.add(fileName);
+							p.add(description.getText());
+	
+							AnalysisProgressMonitor apm = new AnalysisProgressMonitor(
+									b,
+									AnalysisProgressMonitor.AnalysisTask.LIMMASAMPLES,
+									p);
+							apm.run();
+							t = apm.getTask();
+							Thread wt = new Thread() {
+								public void run() {
+									try {
+										String fileName = t.get();
+										if (fileName == null)
+											{
+											try{
+												SwingUtilities.invokeLater(new Runnable(){public void run(){
+													JOptionPane.showMessageDialog(null, "No groups found", "Error", JOptionPane.ERROR_MESSAGE);
+													}});
+												}catch(Exception e){e.printStackTrace();}
+											return;
+											}
+										else {
+											session.getMainWindow().getFileMenuManager().readGroups(new File(fileName).getAbsolutePath(), new File(fileName), session);
+											}
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+							};
+							wt.start();
+							setVisible(false);
+							}
+						else
+								{
+								ArrayList<String> sg1=new ArrayList<String>();
+								for(Object o:group1.getSelectedValues())
+									sg1.add((String)o);
+								ArrayList<String> sg2=new ArrayList<String>();
+								for(Object o:group2.getSelectedValues())
+									sg2.add((String)o);
 								setVisible(false);
 								System.err.println("Multiple EFVs selected");
-								JOptionPane.showMessageDialog(null, "Only one experimental factor value (EFV) can be selected per group.\n If you want to select all EFVs, select the experimental factor itself", "Error", JOptionPane.ERROR_MESSAGE);
+								try{
+									SwingUtilities.invokeLater(new Runnable(){public void run(){
+										JOptionPane.showMessageDialog(null, "Only one experimental factor value (EFV) can be selected per group.\n If you want to select all EFVs, select the experimental factor itself", "Error", JOptionPane.ERROR_MESSAGE);
+										}});
+									}catch(Exception ex){ex.printStackTrace();}
 								}
 						}
 					}
@@ -493,22 +618,24 @@ public class DiffExpPanel extends javax.swing.JFrame {
 			}
 
 			ExpressionData md = session.getMicroarrayData();
+			//Add experimental factors
 			ArrayList<String> efs = new ArrayList<String>();
-			// NOTA: lo quitamos, es poco intuitivo, incrementa mucho la
-			// combinatoria y su funci—n
-			// se puede realizar mendiante el resto. Adem‡s con los nuevos
-			// cambios es dif’cil de implementar
-			//efs.add("rest");
-			for (String ef : md.experimentFactors) {
+			for (String ef : md.experimentFactors) 
+				{
 				efs.add(ef);
 				ArrayList<String> alreadyAdded = new ArrayList<String>();
-				for (String efv : md.experimentFactorValues.get(ef)) {
-					if (!alreadyAdded.contains(efv)) {
+				for (String efv : md.experimentFactorValues.get(ef)) 
+					{
+					if (!alreadyAdded.contains(efv)) 
+						{
 						alreadyAdded.add(efv);
 						efs.add("   " + efv);
+						}
 					}
 				}
-			}
+			efs.add("Sample names");
+			for(String c:md.conditionNames)	efs.add("   "+c);
+				
 
 			{
 				jScrollPane1 = new JScrollPane();

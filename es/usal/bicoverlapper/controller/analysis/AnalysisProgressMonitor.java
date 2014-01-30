@@ -183,6 +183,7 @@ public class AnalysisProgressMonitor extends JPanel implements ActionListener,
 							// GEO via GEOquery
 							// BiocConductor package
 		public final static int TOPGO_TEST = 18;// enrichment test
+							public static final int LIMMASAMPLES = 19;
 
 		public AnalysisTask(Analysis b, int type, ArrayList<Object> params) {
 			this.b = b;
@@ -309,6 +310,28 @@ public class AnalysisProgressMonitor extends JPanel implements ActionListener,
 						((Double) params.get(4)).doubleValue(),
 						((String) params.get(5)), ((String) params.get(6)),
 						((String) params.get(7)));
+
+				break;
+			case LIMMASAMPLES:
+				System.out.println((ArrayList<String>) params.get(0));
+				System.out.println((ArrayList<String>) params.get(1));
+				System.out.println(((String) params.get(2)));
+				System.out.println(((String) params.get(3)));
+				System.out.println(((Boolean) params.get(4)).booleanValue());
+				System.out.println(((Double) params.get(5)).doubleValue());
+				System.out.println(((Double) params.get(6)).doubleValue());
+				System.out.println(((String) params.get(7)));
+				System.out.println(((String) params.get(8)));
+				System.out.println(((String) params.get(9)));
+
+				res = b.limmaSampleNames(((ArrayList<String>) params.get(0)),
+						((ArrayList<String>) params.get(1)),
+						((String) params.get(2)), ((String) params.get(3)),
+						((Boolean) params.get(4)).booleanValue(),
+						((Double) params.get(5)).doubleValue(),
+						((Double) params.get(6)).doubleValue(),
+						((String) params.get(7)), ((String) params.get(8)),
+						((String) params.get(9)));
 
 				break;
 			case LIMMAEFALL:

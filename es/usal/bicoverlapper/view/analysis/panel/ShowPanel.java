@@ -1,8 +1,6 @@
 package es.usal.bicoverlapper.view.analysis.panel;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.Map;
 

@@ -100,6 +100,7 @@ diffAnalysis2=function(mt, g1, nameG1="Group 1", g2, nameG2="Group 2", interesti
 	}
 
 # Simplified version of diffAnalysis. No volcano plot print option. Limma without filtering columns out of g1 and g2.
+# mt - numeric matrix
 # pvalT - now it is not a -log but a normal value (e.g. 0.05, 0.001, 0.000001, etc.). It is corrected by adjustMethod
 # diffT - filter out genes with lower differential expression than diffT
 # g - experimental factor values (for example: "0 min", "0 min", "60 min", "60 min", "180 min", "180 min")
@@ -127,21 +128,39 @@ diffAnalysis=function(mt, g, g1, g2, pvalT=0.01, diffT=0, adjustMethod="BH", byR
 		else
 			tt=topTable(fit2.eBayes, adjust=adjustMethod, lfc=difft, number=numRank)
 		
-		degs=as.numeric(rownames(tt))
-		
-		if(return=="all" || dim(tt)[1]==0) 
-			degs
-		else
-		{
-			if(return=="up")
+		if(length(grep("ID",colnames(tt)))>=1) #limma up to R 3.0 (numeric rownames)
 			{
-			degs[which(tt[,"logFC"]>0)]	
-			}
+			degs=as.numeric(rownames(tt))
+			if(return=="all" || dim(tt)[1]==0) 
+				degs
 			else
-			{
-			degs[which(tt[,"logFC"]<0)]	
+				{
+				if(return=="up")
+					{
+					degs[which(tt[,"logFC"]>0)]	
+					}
+				else
+					{
+					degs[which(tt[,"logFC"]<0)]	
+					}
+				}		
 			}
-		}	
+		else	#limma on R 3.0 (no ID column, text rownames)
+			{
+			if(return=="all" || dim(tt)[1]==0) 
+				which(rownames(mt) %in% rownames(tt))
+			else
+				{
+				if(return=="up")
+				   {
+				   which(rownames(mt) %in% rownames(tt[which(tt[,"logFC"]>0),]))
+			       }
+				else
+				   {
+				   which(rownames(mt) %in% rownames(tt[which(tt[,"logFC"]<0),]))
+			       }
+				}
+			}
 	}
 	
 # Like above, but in this case several differential expression analyses are performed, 
@@ -239,101 +258,3 @@ diffAnalysisAll=function(m, ef=list(), efNames=c(),
 	names(ret)=efNames
 	ret
 	}
-	
-
-#Figure for PLOS
-	rpls=c("YDR471W", "YKL006W", "YDR447C", "YHR021C", "YJL189W", "YDR500C", "YLR367W", "YLR061W", "YMR142C", "YPL143W", "YMR194W", "YGR148C", "YLR185W", "YLR344W", "YER131W", "YLR448W", "YOL127W", "YGL030W", "YDL130W", "YBR181C", "YGR214W", "YGL123W", "YER074W", "YIL069C", "YLR406C", "YLL045C", "YKL156W", "YDR497C", "YNL067W", "YBR084C-A", "YEL054C", "YER117W")
-	rpss=c("YGL253W", "YNL096C", "YKL081W", "YPL079W", "YGR118W", "YER056C-A", "YER043C", "YGL031C", "YDL191W", "YLR167W", "YLR264W", "YPR102C", "YIL018W", "YMR116C", "YLR048W", "YGL135W", "YBR191W", "YJR094W-A", "YKL180W", "YJL136C", "YHR203C", "YMR121C", "YIL052C", "YDR418W", "YDR064W", "YDL082W", "YDL083C", "YPL220W", "YGL076C", "YGR034W", "YDL081C")
-	mrps=c("YBR257W", "YBR251W", "YPL013C", "YAL033W", "YMR188C", "YNL306W", "YNL284C", "YKL142W", "YPR166C", "YBL018C", "YDR237W", "YJL096W", "YDL202W", "YPR100W", "YNL282W", "YMR225C", "YNL252C", "YMR158W", "YPR099C", "YML025C", "YNL185C", "YDR322W", "YKL138C", "YBL038W", "YLR145W", "YHL004W", "YBL090W", "YKR085C", "YKL003C", "YDR462W", "YKR103W", "YPL173W", "YMR024W", "YKR006C", "YDR116C", "YNR036C", "YDR347W", "YCR003W", "YKR104W", "YHR062C", "YNR022C", "YLR439W", "YMR193W", "YBR167C", "YLR107W", "YBR268W", "YLR059C", "YGR084C", "YFR049W", "YKL170W", "YDR337W", "YPL118W", "YMR286W", "YGR220C", "YKL169C", "YGR165W", "YGR219W", "YGR076C", "YNL221C", "YBR146W", "YJL063C", "YBR282W", "YKL167C", "YOR150W", "YML009C", "YDL045W-A", "YHR147C", "YLL015W", "YIR015W", "YNL177C", "YDR478W", "YDR405W", "YGR030C", "YLR312W-A", "YBR122C", "YNL005C")
-	#fat=c("YJR016C", "YJR143C", "YPL256C", "YCR034W", "YGL055W")
-	fat=c("YNR016C", "YKL182W", "YPL231W", "YCR034W", "YGL055W")
-	fatRest=c()
-	fatNames=c("ACC1", "FAS1", "FAS2", "FEN1", "OLE1")
-	tt=topTable(fit2.eBayes, p.value=1, adjust=adjustMethod, lfc=0, number=dim(mt)[1])
-	if(print)
-	{
-		postscript("/Users/rodri/Documents/bioviz/plos/figures/NonEnriched/fatty/R-Bicover/volcano.eps", horizontal=T, width=1024, height=1024, onefile=FALSE)
-	#	pdf("/Users/rodri/Documents/bioviz/plos/figures/NonEnriched/fatty/R-Bicover/volcano.pdf")
-		#png("/Users/rodri/Documents/bioviz/plos/figures/NonEnriched/fatty/R-Bicover/volcano.png")
-		#tiff("/Users/rodri/Documents/bioviz/plos/figures/NonEnriched/fatty/R-Bicover/volcano.tiff")
-		par(new=F)
-		plot(tt[,"logFC"],-log10(tt[,"adj.P.Val"]),cex=.25, col="grey",
-				xlim=range(tt[,"logFC"]),
-				ylim=range(-log10(tt[,"adj.P.Val"])),xlab="Average (log) Fold-Change",
-				ylab="LOD score - Negative log 10 of P-value")
-		#points(Difference[o1],lodd[o1],pch=18,col="blue",cex=1.5) 
-		#points(Difference[oo2],lodd[oo2],pch=1,col="red",cex=2,lwd=2) 
-		#points(Difference[interestingNames],lodd[interestingNames],pch=1,col="red",cex=2,lwd=2) 
-		rplsel=which(tt[,"ID"] %in% rpls)
-		par(new=T)
-		plot(tt[rplsel,"logFC"],-log10(tt[rplsel,"adj.P.Val"]),cex=.5, col="orange",
-				xlim=range(tt[,"logFC"]),
-				ylim=range(-log10(tt[,"adj.P.Val"])), xlab="", ylab="")
-		rpssel=which(tt[,"ID"] %in% rpss)
-		par(new=T)
-		plot(tt[rpssel,"logFC"],-log10(tt[rpssel,"adj.P.Val"]),cex=.5, col="orange",
-				xlim=range(tt[,"logFC"]),
-				ylim=range(-log10(tt[,"adj.P.Val"])), xlab="", ylab="")
-		mrpsel=which(tt[,"ID"] %in% mrps)
-		par(new=T)
-		plot(tt[mrpsel,"logFC"],-log10(tt[mrpsel,"adj.P.Val"]),cex=.5, col="purple",
-				xlim=range(tt[,"logFC"]),
-				ylim=range(-log10(tt[,"adj.P.Val"])), xlab="", ylab="")
-		
-		fatsel=which(tt[,"ID"] %in% fat)
-		par(new=T)
-		plot(tt[fatsel,"logFC"],-log10(tt[fatsel,"adj.P.Val"]),cex=.5, col="black",
-				xlim=range(tt[,"logFC"]),
-				ylim=range(-log10(tt[,"adj.P.Val"])), xlab="", ylab="")
-		
-		tt2=topTable(fit2.eBayes, p.value=0.001, adjust=adjustMethod, lfc=diffT, number=dim(mt)[1])
-		abline(h=-log10(max(tt2[,"adj.P.Val"])),col="blue", lty=3)
-		tt3=topTable(fit2.eBayes, p.value=0.01, adjust=adjustMethod, lfc=diffT, number=dim(mt)[1])
-		abline(h=-log10(max(tt3[,"adj.P.Val"])),col="blue", lty=3)
-		tt4=topTable(fit2.eBayes, p.value=0.05, adjust=adjustMethod, lfc=diffT, number=dim(mt)[1])
-		abline(h=-log10(max(tt4[,"adj.P.Val"])),col="blue", lty=3)
-		
-		abline(v=1,col="red", lty=3)
-		abline(v=-1,col="red", lty=3)
-		abline(v=2,col="red", lty=3)
-		abline(v=-2,col="red", lty=3)
-		abline(v=3,col="red", lty=3)
-		abline(v=-3,col="red", lty=3)
-		
-		title(paste("Volcano plot: 0' vs 180'"))
-		
-		#text(tt[fatsel, "logFC"], -log10(tt[fatsel,"adj.P.Val"]), labels=tt[fatsel, "ID"], cex=0.5, pos=3)
-		#text(tt[fatsel, "logFC"], -log10(tt[fatsel,"adj.P.Val"]), labels=tt[which(tt[, "ID"] %in% fat),"ID"], cex=0.5, pos=3)
-text(tt[fatsel, "logFC"], -log10(tt[fatsel,"adj.P.Val"]), labels=c("OLE1", "FAS2", "FEN1", "FAS1", "ACC1"), cex=0.7, pos=3)
-	text(5, 3, labels=c("Cyt. ribosome genes of interest"), cex=0.8, pos=3, col="orange")
-	text(3, 0, labels=c("Mit. ribosome genes"), cex=0.8, pos=3, col="purple")
-#if(length(interestingNames)>0)	text(Difference[interestingNames], lodd[interestingNames], labels=rownames(mt)[interestingNames], cex=0.5, pos=3, col="red")
-		dev.off()
-		
-	}
-
-	g1="0 min"
-	lfm=sapply(c("40 min", "60 min", "90 min", "120 min", "180 min"), function(g2)
-		{
-			require(limma)
-			population.groups=factor(make.names(g))
-			design=model.matrix(~0+population.groups)
-			colnames(design)=levels(population.groups)
-			fit=lmFit(mt, design)
-			
-			#trick to be able to use parameters as values for expression
-			mycontrast=paste(make.names(g1),"-",make.names(g2), sep="")
-			cmd <- paste("contrasts <- makeContrasts(", mycontrast, ", levels = design)", sep ='"')
-			eval(parse(text = cmd))	
-			
-			fit2=contrasts.fit(fit, contrasts)
-			fit2.eBayes=eBayes(fit2)
-			tt=topTable(fit2.eBayes, p.value=1, adjust=adjustMethod, lfc=0, number=dim(mt)[1])
-			tt[order(tt[,"ID"]),"logFC"]
-		})
-rownames(lfm)=sort(tt[,"ID"])
-colnames(lfm)=rownames(unique(pData(ae)))
-lfm[c("YNR016C", "YKL182W", "YPL231W", "YCR034W", "YGL055W"),]
-esfc=new("ExpressionSet", exprs=lfm, annotation="ensembl_gene_id", phenoData=new("AnnotatedDataFrame", data=unique(pData(ae))[,-1]))
-write(x=t(cbind(rownames(lfm),-lfm)), file="/Users/rodri/Documents/bioviz/matrices/E-MTAB-153-FC-limma.txt", ncolumns=6, sep="\t")
-

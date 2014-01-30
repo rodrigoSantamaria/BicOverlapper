@@ -5,36 +5,19 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintStream;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
-import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 
 import net.sf.epsgraphics.ColorMode;
 import net.sf.epsgraphics.EpsGraphics;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.DOMImplementation;
-
-import com.sun.tools.internal.ws.processor.generator.Names;
 
 import ch.usi.inf.sape.hac.HierarchicalAgglomerativeClusterer;
 import ch.usi.inf.sape.hac.agglomeration.AgglomerationMethod;
@@ -45,26 +28,17 @@ import ch.usi.inf.sape.hac.dendrogram.DendrogramNode;
 import ch.usi.inf.sape.hac.dendrogram.ObservationNode;
 import ch.usi.inf.sape.hac.experiment.DissimilarityMeasure;
 
-import es.usal.bicoverlapper.controller.analysis.AnalysisProgressMonitor;
 import es.usal.bicoverlapper.controller.kernel.Selection;
 import es.usal.bicoverlapper.controller.kernel.Session;
-import es.usal.bicoverlapper.controller.manager.configurationManager.ConfigurationMenuManager;
-import es.usal.bicoverlapper.controller.util.Translator;
 import es.usal.bicoverlapper.model.microarray.ExpressionData;
-import es.usal.bicoverlapper.view.configuration.panel.HeatmapParameterConfigurationPanel;
-import es.usal.bicoverlapper.view.configuration.panel.KeggParameterConfigurationPanel;
 import es.usal.bicoverlapper.view.diagram.overlapper.JProcessingPanel;
 
 
-import processing.core.PApplet;
 import processing.core.PFont;
-import processing.core.PGraphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Rectangle2D.Double;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyVetoException;
 
 /**
  * Class to display static, simple heatmaps for the genes in a given term.

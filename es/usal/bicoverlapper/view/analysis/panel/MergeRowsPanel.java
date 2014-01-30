@@ -1,43 +1,24 @@
 package es.usal.bicoverlapper.view.analysis.panel;
 import com.cloudgarden.layout.AnchorLayout;
-import com.jgoodies.forms.layout.FormLayout;
-
-import es.usal.bicoverlapper.controller.kernel.Selection;
 import es.usal.bicoverlapper.controller.kernel.Session;
 import es.usal.bicoverlapper.controller.manager.FileMenuManager;
 import es.usal.bicoverlapper.model.gene.GeneAnnotation;
-import es.usal.bicoverlapper.model.microarray.ExpressionData;
-
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JDesktopPane;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.LayoutStyle;
 import javax.swing.ListModel;
 
 import javax.swing.WindowConstants;
 import javax.swing.border.LineBorder;
-import javax.swing.SwingUtilities;
-
-import org.rosuda.JRI.REXP;
 
 
 /**
