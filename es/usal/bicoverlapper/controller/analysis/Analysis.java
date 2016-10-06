@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import javax.swing.JOptionPane;
@@ -17,7 +18,9 @@ import org.rosuda.JRI.Rengine;
 
 import es.usal.bicoverlapper.controller.util.ArrayUtils;
 import es.usal.bicoverlapper.model.annotations.GOTerm;
+import es.usal.bicoverlapper.model.gene.GeneAnnotation;
 import es.usal.bicoverlapper.model.microarray.ExpressionData;
+import es.usal.bicoverlapper.model.stats.Stats;
 import es.usal.bicoverlapper.utils.RUtils;
 
 /**
@@ -238,7 +241,7 @@ public class Analysis {
 	public int loadBioconductorLibrary(String library)
 		{
 		exp = r.eval("library(" + library + ")");
-		System.out.println("loadRLibrary de " + library + " = " + exp);
+		System.out.println("loadRBioconductorLibrary: " + library + " = " + exp);
 		if (exp == null) {
 			JOptionPane
 			.showMessageDialog(
@@ -295,7 +298,7 @@ public class Analysis {
 	 *        name will be exprs. Otherwise, it will be exprs.label
 	 * 
 	 */
-	// TODO: esto ser’a mucho m‡s r‡pido si leyŽramos la matriz directamente,
+	// TODO: esto serï¿½a mucho mï¿½s rï¿½pido si leyï¿½ramos la matriz directamente,
 	// no???
 	public void loadMatrix(String label) {
 		if (microarrayData != null) {
@@ -304,7 +307,7 @@ public class Analysis {
 				System.out.println("loading matrix into R");
 				long t0 = System.currentTimeMillis();
 				
-				// modificación para que funcione en windows
+				// modificaciï¿½n para que funcione en windows
 				String os = System.getProperty("os.name").toLowerCase();
 				if (os.indexOf("win") >= 0) {
 					// si estamos en windows
@@ -316,8 +319,8 @@ public class Analysis {
 					System.out.println("En r.eval source de unix y exp = "+ exp);
 				}
 
-				// R necesita las barras de dirección duplicadas, y la forma de
-				// hacerlo es ésta
+				// R necesita las barras de direcciï¿½n duplicadas, y la forma de
+				// hacerlo es ï¿½sta
 				String rutaWindowsParaR = microarrayData.filePath.replaceAll(
 						"\\\\", "\\\\\\\\");
 
@@ -339,7 +342,7 @@ public class Analysis {
 					}catch(Exception e){e.printStackTrace();}
 					}
 				
-				// hasta aquí la modificación para que funcione en windows
+				// hasta aquï¿½ la modificaciï¿½n para que funcione en windows
 
 				System.out.println("matrix loaded, computing some statistics");
 				// compute median by column and quantiles
@@ -419,7 +422,7 @@ public class Analysis {
 	 * @param selection
 	 * @return
 	 */
-	public ArrayList<GOTerm> goEnrichment(double alpha, String ontology, ArrayList<String> selection)
+	public ArrayList<GOTerm> topGOenrichment(double alpha, String ontology, ArrayList<String> selection)
 		{
 		String m = this.microarrayData.rMatrixName;
 			if (r == null) {
@@ -457,6 +460,86 @@ public class Analysis {
 			}
 		return table;
 		}
+	
+	
+	public ArrayList<GOTerm> javaGOenrichment(ArrayList<GeneAnnotation> annot, double alpha, int minAnnotations, int maxAnnotations, String correction)
+		{
+		if(r.eval("gtoc")==null)//if gtoc is computed
+			{
+			long tgo=System.currentTimeMillis();
+			r.eval("group=featureNames("+this.microarrayData.rMatrixName+")");
+			if(this.microarrayData.isBioMaRt)
+				{
+				REXP exp = r.eval("ugolist=unlist(getBMGO(group,martEnsembl))"); 
+				exp = r.eval("ugolist=ugolist[which(!is.na(ugolist))]");
+				exp = r.eval("gtoc=table(ugolist)");
+				}
+			else
+				{
+				REXP exp = r.eval("ugolist=unlist(mget(group,"+this.microarrayData.chip+this.microarrayData.rgo+", ifnotfound=NA))"); //with platform db, it's 33s for human whole genome
+				exp = r.eval("gtoc=table(ugolist[grep(\"GO:\", ugolist)])");
+				}
+			System.out.println("Time in retrieving term occurrences:"+(System.currentTimeMillis()-tgo));//about 40s whole process TODO: check if possible with biomart
+			}
+		
+	
+		//1) Prepare the GO terms found in genes of interests 	
+		HashMap<String, GOTerm> terms=new HashMap<String, GOTerm>();
+		for(GeneAnnotation ga : annot)
+			{
+			if(ga.getGoTerms()!=null)
+				{
+				for(GOTerm gt : ga.getGoTerms())
+					{
+					if(terms.containsKey(gt.getId()))
+						{	
+						terms.get(gt.getId()).occurences++;
+						}
+					else
+						{
+						GOTerm newGT=new GOTerm(gt);
+						newGT.occurences=1;
+						REXP exp=r.eval("gtoc[\""+gt.getId()+"\"]");
+						if(exp!=null)
+							{
+							newGT.universe=exp.asInt();
+							terms.put(gt.getId(), newGT);
+							}
+						}
+					}
+				}
+			}
+		
+		System.out.println("Terms with annotations: "+terms.size());
+		
+		//2) Filter out by annotation size and compute p-values
+		ArrayList<GOTerm> eterms=new ArrayList<GOTerm>();
+		for(GOTerm gt : terms.values())
+			if(gt.universe>minAnnotations && gt.universe<maxAnnotations)
+				{
+				gt.pvalue=Stats.fisherTest(gt.universe, annot.size(), gt.occurences, this.microarrayData.getNumGenes());
+				eterms.add(gt);
+				}
+		
+		System.out.println("Terms with enough annotations: "+eterms.size());
+		
+		
+		//3) Filter by significance Threshold (+correction) 
+		double threshold=alpha;
+		if(correction.equals("fdr"))
+			threshold=Stats.fdr(alpha, new HashSet<GOTerm>(eterms));
+		else if(correction.equals("fwer"))
+			threshold=Stats.fwer(alpha, new HashSet<GOTerm>(eterms));
+		else if(correction.equals("bonferroni"))
+			threshold=Stats.bonferroni(alpha, eterms.size());
+		
+		ArrayList<GOTerm> golist=new ArrayList<GOTerm>();
+		for(GOTerm gt : eterms)
+			if(gt.pvalue<=threshold)
+				golist.add(gt);
+		System.out.println("Terms enriched: "+golist.size());
+		return golist;
+		}
 
 	/**
 	 * Performs the BiMax biclustering with the R implementation in package
@@ -489,7 +572,7 @@ public class Analysis {
 	public String bimax(boolean percentage, double threshold, boolean under,
 			int minr, int minc, int maxNumber, String outFile,
 			String description) {
-		// TODO: La binarizaci—n por porcentaje no rula
+		// TODO: La binarizaciï¿½n por porcentaje no rula
 		// TODO: El post-filtrado por % de solapamiento no rula
 		String m = this.microarrayData.rMatrixName;
 		if (r == null) {
@@ -1093,8 +1176,8 @@ public class Analysis {
 		exp = r.eval("source(\"es/usal/bicoverlapper/source/codeR/difAnalysis.R\")");
 		//TODO: if nameGroup1 or 2 is rest, perform the proper condition identification.
 		//if(nameGroup1.equals("rest"))
-		if(r.eval("length(grep(\"^"+nameGroup1+"$\", "+RUtils.getRList(microarrayData.getExperimentFactorValues(ef))+"))").asInt()<=1 ||
-				r.eval("length(grep(\"^"+nameGroup2+"$\", "+RUtils.getRList(microarrayData.getExperimentFactorValues(ef))+"))").asInt()<=1)
+		if(r.eval("length(grep(\"^"+nameGroup1.replace("+",  "\\+")+"$\", "+RUtils.getRList(microarrayData.getExperimentFactorValues(ef))+"))").asInt()<=1 ||
+				r.eval("length(grep(\"^"+nameGroup2.replace("+",  "\\+")+"$\", "+RUtils.getRList(microarrayData.getExperimentFactorValues(ef))+"))").asInt()<=1)
 			{
 			System.err.println("Error, not enough replicates of "+nameGroup1+" or"+ nameGroup2);
 			JOptionPane.showMessageDialog(null, "Differential expression cannot be done. Experimental factors must have two or more replicates.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1955,7 +2038,7 @@ public class TopGOTask extends
 	public ArrayList<GOTerm> doInBackground() 
 		{
 		try {
-			golist = goEnrichment(alpha, ontology,  genes);
+			golist = topGOenrichment(alpha, ontology,  genes);
 			progress = 100;
 			setProgress(progress);
 			done();
@@ -1974,6 +2057,54 @@ public class TopGOTask extends
 		return golist;
 		}
 	}
+
+public class JavaGOTask extends	SwingWorker<ArrayList<GOTerm>, Void>
+	{
+	public ArrayList<GeneAnnotation> annot;
+	public String correction = "";
+	public double alpha=0.01;
+	public int minAnnotations;
+	public int maxAnnotations;
+	
+	public ArrayList<GOTerm> golist = null;
+	public String message = "";
+	public String errorMessage = "";
+	private int progress;
+	
+	public JavaGOTask(ArrayList<GeneAnnotation> annot, double alpha, int minAnnotations, int maxAnnotations, String correction) 
+		{
+		this.annot = annot;
+		this.minAnnotations = minAnnotations;
+		this.maxAnnotations = maxAnnotations;
+		this.correction = correction;
+		this.alpha=alpha;
+		golist = new ArrayList<GOTerm>();
+		}
+	
+	@Override
+	public ArrayList<GOTerm> doInBackground() 
+		{
+		try {
+			golist = javaGOenrichment(annot, alpha, minAnnotations, maxAnnotations, correction);
+			progress = 100;
+			setProgress(progress);
+			done();
+			}
+		catch (Exception e) {
+			progress = 100;
+			setProgress(progress);
+			done();
+			JOptionPane.showMessageDialog(
+					null,
+					"Error performing the enrichemnt analysis: "
+							+ e.getMessage() + "\n" + errorMessage,
+					"Analysis Error", JOptionPane.ERROR_MESSAGE);
+			}
+		
+		return golist;
+		}
+	}
+
 
 
 }

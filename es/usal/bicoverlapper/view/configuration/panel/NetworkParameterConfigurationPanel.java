@@ -54,7 +54,7 @@ public class NetworkParameterConfigurationPanel extends javax.swing.JPanel {
 		try {
 			this.setLayout(null);
 			setPreferredSize(new Dimension(300, 100));
-			{
+				{
 				Forces = new JButton();
 				this.add(Forces, "0, 0");
 				Forces.setText("Change Forces");
@@ -62,7 +62,7 @@ public class NetworkParameterConfigurationPanel extends javax.swing.JPanel {
 				Forces.setToolTipText("Modify the forces schema for layout");
 				ForceConfigAction fca=new ForceConfigAction(null, fdl.getForceSimulator());
 			    Forces.addActionListener(fca);
-			}
+				}
 			{
 				AnimateExpression = new JCheckBox();
 				this.add(AnimateExpression, "1, 0");

@@ -73,6 +73,7 @@ gseaLite=function(eset=NA, geneSets=NA, model=NA, sdThreshold=2.0, type="GO")
 # gs0          - matrix A of N genes x M gene sets where Aij is 1 if gene i belongs to gene set j
 gsea=function(eset=NA, filterCutoff=0.5, minGenesInGS=5, envir=NA, membership=NA, model=NA, ef=NA, efv1=NA, efv2=NA, type="GO", sdThreshold=2.0, outputPath=NA, gs0=NA)
 	{
+	require("Biobase")
 	#0) Check params
 	if(type=="PATH")
 		require(KEGG.db)
@@ -121,24 +122,8 @@ gsea=function(eset=NA, filterCutoff=0.5, minGenesInGS=5, envir=NA, membership=NA
 	rm(gs0)
 	gs = gs[, featureNames(workingEset)] 	
 	
-	#working with lists till the last moment (might save some memory, but will be slower...
-	#haveGS=sapply(gs0, function(x) length(x))
-	#workingEset=filt[names(haveGS)[which(haveGS>0)],]
-	#gs = gs0[featureNames(workingEset)] 	
-	#ug=unlist(gs)
-	#sizes=sapply(unique(ug), function(x) length(which(ug==x)) )
-	#gs=lapply(gs, function(x) x [which(x %in% names(sizes)[which(sizes>=minGenesInGS)])])
-	#now, finally, convert it to a matrix (much smaller, in the case of hgu133plus2+GO, it is a matrix of 6767x8492 instead of 54675x11708)
-	#mat=matrix(0, length(gs), length(unique(unlist(gs))))
-	#rownames(mat)=names((gs))
-	#colnames(mat)=unique(unlist(gs))
-	#mat2=sapply(rownames(mat), function(x){ mat[x,which(colnames(mat) %in% gs[[x]])]=1; mat[x,] })
-	#--
-
-
-	
 	#2) Gene Set Enrichment Analysis
-	ret=gseaLite(workingEset, geneSets=gs, model=model, sdThreshold=sdThreshold, type=type)
+	ret=gseaLite(workingEset, geneSets=gs, model=~as.factor(targetPhenotype), sdThreshold=sdThreshold, type=type)
 	ret
 	}	
 

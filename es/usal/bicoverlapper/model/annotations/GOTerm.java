@@ -36,6 +36,8 @@ public class GOTerm {
 	 * have this GO Term
 	 */
 	public int occurences;//In case of hypergeometric test, t
+	
+	public int universe;//Total number of occurrences in the domain
 	/**
 	 * In the case of a GOTerm associated to a single gene, it means nothing, and is usually 
 	 * undefined
@@ -43,7 +45,7 @@ public class GOTerm {
 	 * In the case of a GOTerm associated to a group of genes, it is the p-value of a hypergeometric
 	 * test against all the genes in the microarray data matrix.
 	 */
-	private double pvalue;//In case of hypergeometric tests
+	public double pvalue;//In case of hypergeometric tests
 	
 	public GOTerm()
 		{
@@ -63,6 +65,17 @@ public class GOTerm {
 		ontology=o;
 		evidence=e;
 		occurences=oc;
+		}
+	
+	public GOTerm(GOTerm gt)
+		{
+		term=gt.term;
+		id=gt.id;
+		definition=gt.definition;
+		ontology=gt.ontology;
+		evidence=gt.evidence;
+		occurences=gt.occurences;
+		universe=0;
 		}
 
 	/**

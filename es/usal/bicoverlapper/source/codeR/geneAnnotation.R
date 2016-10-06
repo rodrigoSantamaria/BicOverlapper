@@ -12,14 +12,15 @@ getEnsemblMart=function(species="Homo sapiens")
 	if(length(strsplit(species, " ")[[1]])>=2) 	
 	{
 			spec=tolower(paste( substr(strsplit(species, " ")[[1]][1],0,1), substr(strsplit(species, " ")[[1]][2],0,2), sep=""))
+			speclong=tolower(paste( substr(strsplit(species, " ")[[1]][1],0,1), strsplit(species, " ")[[1]][2], sep=""))
 			specens=tolower(paste( substr(strsplit(species, " ")[[1]][1],0,1), strsplit(species, " ")[[1]][2], "_gene_ensembl", sep=""))
 	}
 	if(length(spec)==0)	stop("Species name is wrong")
-	if(species=="Schizosaccharomyces pombe")
+	if(species=="Schizosaccharomyces pombe" || length(grep("fuckeliana", species))>0)
 		{
 		marts=listMarts()[,"biomart"]
 		martName=as.character(marts[grep("fungi_mart", marts)[1]])
-		mart = useMart(martName, dataset="spombe_eg_gene")
+		mart = useMart(martName, dataset=paste(speclong,"_eg_gene",sep=""))
 		}
 	else
 		{
@@ -34,11 +35,11 @@ getEnsemblMart=function(species="Homo sapiens")
 			}
 		else
 			{
-			if(species=="Arabidopsis thaliana")
+			if(species=="Arabidopsis thaliana" || species=="Zea mays")
 				{
 				marts=listMarts()[,"biomart"]
 				martName=as.character(marts[grep("plants_mart", marts)[1]])
-				mart = useMart(martName, dataset="athaliana_eg_gene")
+				mart = useMart(martName, dataset=paste(speclong, "_eg_gene", sep=""))
 				}
 			else
 				mart = useMart("ensembl", dataset=specens)
@@ -86,6 +87,8 @@ getBMGenes=function(geneids, mart, species="Homo sapiens", type)
 			geneens=getGene( id = geneids, type = type, mart = mart)[,c(type, "symbol","description","ensembl_gene_id")]
 		else if(length(grep("^uniprot_genename$", listAttributes(mart)[,1]))==1)
 			geneens=getGene( id = geneids, type = type, mart = mart)[,c(type, "uniprot_genename","description","ensembl_gene_id")]
+		else if(length(grep("^external_gene_id$", listAttributes(mart)[,1]))==1)
+			geneens=getGene( id = geneids, type = type, mart = mart)[,c(type, "external_gene_id","description","ensembl_gene_id")]
 		}
 	#there might be duplicated, we remove them
 	geneens=geneens[-which(duplicated(geneens[,type])),]

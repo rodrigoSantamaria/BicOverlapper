@@ -384,7 +384,11 @@ public abstract class Diagram extends JPanel {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		
 		if(panelPaleta != null)
+			{
 			tabbedPane.addTab(Translator.instance.configureLabels.getString("s31"), panelPaleta);
+			tabbedPane.setSelectedIndex(0);
+			}
+		
 		
 		if(panelAnclajes != null)
 			tabbedPane.addTab(Translator.instance.configureLabels.getString("s23"), panelAnclajes);
@@ -392,9 +396,10 @@ public abstract class Diagram extends JPanel {
 		if(panelParametros != null){
 			this.panelParametros = panelParametros;
 			tabbedPane.addTab(Translator.instance.configureLabels.getString("s8"), panelParametros);
+			//tabbedPane.setSelectedComponent(panelParametros);
+			tabbedPane.setSelectedIndex(tabbedPane.getComponentCount()-1);
 		}
 		
-		tabbedPane.setSelectedIndex(0);
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());

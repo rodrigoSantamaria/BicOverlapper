@@ -13,13 +13,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
@@ -46,6 +49,7 @@ import es.usal.bicoverlapper.controller.kernel.Session;
 import es.usal.bicoverlapper.model.annotations.GOTerm;
 import es.usal.bicoverlapper.model.gene.GeneAnnotation;
 import es.usal.bicoverlapper.model.gene.GeneRequester;
+import es.usal.bicoverlapper.model.stats.Stats;
 import es.usal.bicoverlapper.utils.RUtils;
 import es.usal.bicoverlapper.utils.Sizeof;
 import es.usal.bicoverlapper.view.analysis.monitor.AnnotationProgressMonitor;
@@ -254,6 +258,8 @@ public class ExpressionData {
 	public double[] minCols;
 	public double[] maxCols;
 	public double[] sdCols;
+	public double sd; //average sd
+
 	public double[] q75;// quantile 75 for each column
 	public double[] q25;// quantile 25 for each column
 	public double[] iqr;// interquantile range, computed as
@@ -277,7 +283,7 @@ public class ExpressionData {
 	private AnalysisTask t;
 	private Session session;
 	
-	//clase que controla la barra de progreso cuando se están obteniendo las anotaciones
+	//clase que controla la barra de progreso cuando se estï¿½n obteniendo las anotaciones
 	//MicroarrayAnnotationsLoadProgressBar mlpb = null;
 	
 	/**
@@ -315,7 +321,7 @@ public class ExpressionData {
 		
 		this.ventana = sesion.getMainWindow();
 
-		// añadido para que funcione en windows (en principio en unix no dará
+		// aï¿½adido para que funcione en windows (en principio en unix no darï¿½
 		// problemas)
 		path = path.replace("\\", "/");
 
@@ -447,6 +453,7 @@ public class ExpressionData {
 		minCols = new double[numConditions];
 		maxCols = new double[numConditions];
 		sdCols = new double[numConditions];
+		sd=0;
 		for (int i = 0; i < numConditions; i++) {
 			averageCols[i] = sdCols[i] = 0;
 			String s = mat.getString(0 + skipRows, i + skipColumns);
@@ -551,11 +558,15 @@ public class ExpressionData {
 	 */
 	private void computeSd() {
 		long t = System.currentTimeMillis();
-		for (int i = 0; i < numConditions; i++) {
+		sd=0;
+		for (int i = 0; i < numConditions; i++) 
+			{
 			for (int j = 0; j < numGenes; j++)
 				sdCols[i] += Math.abs(averageCols[i] - matrix[j][i]);
 			sdCols[i] /= numGenes;
-		}
+			sd+=sdCols[i];
+			}
+		sd/=numConditions;
 		System.out.println("Time to compute sd "
 				+ (System.currentTimeMillis() - t) / 1000.0);
 	}
@@ -1377,9 +1388,9 @@ public class ExpressionData {
 	 */
 	public LinkedList<Integer> searchAnnotations(String what, boolean exact) {
 		LinkedList<Integer> genes = new LinkedList<Integer>();
-		// TODO: si no tenemos todas las anotaciones, va a buscar s—lo en los
+		// TODO: si no tenemos todas las anotaciones, va a buscar sï¿½lo en los
 		// genes que tengan anotaciones...
-		// -> O crear anotaciones para todos aunque estŽn vac’as, o iterar luego
+		// -> O crear anotaciones para todos aunque estï¿½n vacï¿½as, o iterar luego
 		// por los nombres para los que no tengan
 		Iterator<GeneAnnotation> it = geneAnnotations.values().iterator();
 		while (it.hasNext()) {
@@ -2001,7 +2012,7 @@ public class ExpressionData {
 		n = n.substring(0, n.length() - 3) + ")";
 		exp = re.eval("got=getGOTermsByGOID(" + n + ")");// <-tarda entre 30 y
 															// 100ms, lo cual
-															// puede hacer más
+															// puede hacer mï¿½s
 															// de un minuto para
 															// arrays de 10000
 															// genes
@@ -2162,8 +2173,14 @@ public class ExpressionData {
 		public String ontology = "";
 		private int type=0;
 		private Analysis analysis=null;
+		private int minAnnotations;
+		private int maxAnnotations;
+		private String correction;
+		private float alpha;
+		private ArrayList<GeneAnnotation> annot;
 		public static final int TOPGO=0;
 		public static final int GOSTATS=1;
+		public static final int JAVA=2;
 		
 		
 		public void getGOTermsHypergeometric(LinkedList<Integer> genes,
@@ -2230,12 +2247,25 @@ public class ExpressionData {
 			this.analysis=a;
 			golist = new ArrayList<GOTerm>();
 		}
+		
+		public EnrichmentTestTask(ArrayList<GeneAnnotation> annot, float alpha, String correction, int minAnnotations, int maxAnnotations, Analysis a) {
+			this.annot = annot;
+			this.minAnnotations=minAnnotations;
+			this.maxAnnotations=maxAnnotations;
+			this.correction=correction;
+			this.alpha=alpha;
+			this.analysis=a;
+			this.type=EnrichmentTestTask.JAVA;
+			golist = new ArrayList<GOTerm>();
+		}
+
 
 		@Override
 		public ArrayList<GOTerm> doInBackground() {
 			try {
 				if(type==EnrichmentTestTask.GOSTATS)	golist = getGOTermsHypergeometric(genes, ontology, 0.001);
-				else									golist = analysis.goEnrichment(0.01, ontology, getGeneNames(genes));
+				if(type==EnrichmentTestTask.TOPGO)		golist = analysis.topGOenrichment(0.01, ontology, getGeneNames(genes));
+				if(type==EnrichmentTestTask.JAVA)		golist=analysis.javaGOenrichment(annot, alpha, minAnnotations, maxAnnotations, correction);//much faster, only requires R to get annotations
 				progress = 100;
 				setProgress(progress);
 				done();
@@ -2413,6 +2443,8 @@ public class ExpressionData {
 
 			if (abbv.equals("Pf"))// this makes malaria
 				cad = "org." + abbv + ".plasmo.db";
+			if (abbv.equals("Sc"))// this makes malaria
+				cad = "org." + abbv + ".sgd.db";
 			if (cad.contains("Ec"))// this makes E. coli (default K12)
 				cad = "org." + abbv + "K12.eg.db";
 		} else {
@@ -2540,7 +2572,7 @@ public class ExpressionData {
 			if (!searchGO && !searchKEGG) {
 				if (!isBioMaRt) {
 					
-					//en principio se desactivará por defecto y se activará si se contesta que no en el cuadro de diálogo
+					//en principio se desactivarï¿½ por defecto y se activarï¿½ si se contesta que no en el cuadro de diï¿½logo
 					//ventana.menuAnalysisRetrieveDescriptors.setEnabled(false);					
 					
 					if (isGO) {
@@ -2550,8 +2582,7 @@ public class ExpressionData {
 							names = exp.asStringArray();
 						}
 					} else {
-						exp = re.eval("unlist(mget(group," + chip + rname
-								+ ", ifnotfound=NA))");
+						exp = re.eval("unlist(mget(group," + chip + rname+ ", ifnotfound=NA))");
 						if (exp != null) {
 							names = exp.asStringArray();
 						}
@@ -2592,9 +2623,9 @@ public class ExpressionData {
 						//se visualiza la barra de progreso de carga de anotaciones
 						ventana.getMlpb().visualize();
 						
-						//una vez que se buscan, ya no se podrá repetir la búsqueda
+						//una vez que se buscan, ya no se podrï¿½ repetir la bï¿½squeda
 						//ventana.getMenuAnalysisRetrieveDescriptors().setEnabled(false);
-						//también se inhabilitan durante este proceso las opciones que dependen de R (Biclustering, GSEA, Diffexp y Build correl network)
+						//tambiï¿½n se inhabilitan durante este proceso las opciones que dependen de R (Biclustering, GSEA, Diffexp y Build correl network)
 						//ventana.getAnalysisMenuBiclustering().setEnabled(false);
 						//ventana.getMenuAnalysisGSEA().setEnabled(false);
 						//ventana.getMenuAnalysisDifexp().setEnabled(false);
@@ -2633,6 +2664,11 @@ public class ExpressionData {
 						if(exp.asInt()==0)
 							{
 							symbol="external_gene_id";
+							exp=re.eval("length(grep(\""+symbol+"\", listAttributes(martEnsembl)[,1]))");
+							}
+						if(exp.asInt()==0)
+							{
+							symbol="external_gene_name";
 							exp=re.eval("length(grep(\""+symbol+"\", listAttributes(martEnsembl)[,1]))");
 							}
 						
@@ -2735,7 +2771,7 @@ public class ExpressionData {
 						exp = re.eval("l=l[which(!is.na(l))]");
 						exp = re.eval("l=l[grep(\"GO:.*\", l)]");
 						} else {
-						System.err.println("GO es null aqu’ ya!!"
+						System.err.println("GO es null aquï¿½ ya!!"
 								+ re.eval("unique(unlist(df))"));
 					}
 				}
@@ -2744,18 +2780,7 @@ public class ExpressionData {
 				if (exp != null) {
 					goids = re.eval("l").asStringArray();
 					if (goids != null) {
-						exp = re.eval("got=getGOTermsByGOID(l)");// <-tarda
-																	// entre 30
-																	// y 100ms,
-																	// lo cual
-																	// puede
-																	// hacer más
-																	// de un
-																	// minuto
-																	// para
-																	// arrays de
-																	// 10000
-																	// genes
+						exp = re.eval("got=getGOTermsByGOID(l)");// <-tarda entre 30 y 100ms, lo cual puede hacer mï¿½s  de un minuto para arrays de 10000 genes
 						if (exp == null)
 							System.err.println("Error getting GO terms by ID with R");
 
@@ -2785,7 +2810,17 @@ public class ExpressionData {
 											{	
 											System.out.println("Adding term "+t[i]);
 											}
-										GOTerm gt = new GOTerm(t[i], ids[i], d[i], o[i], "", 1);
+										
+										GOTerm gt;
+										if(GOTerms.containsKey(ids[i]))
+											{
+											gt=GOTerms.get(ids[i]);
+											gt.setTerm(t[i]);
+											gt.setDefinition(d[i]);
+											gt.setOntology(o[i]);
+											}
+										else
+											gt = new GOTerm(t[i], ids[i], d[i], o[i], "", 1);
 										GOTerms.put(ids[i], gt);
 										}
 								}
@@ -2885,7 +2920,7 @@ public class ExpressionData {
 
 			System.out.println("---END getMultipleGeneAnnotationsR---");
 			
-			//se habilitan las opciones inhabilitadas durante este método (Biclustering, GSEA, Diffexp y Build correl network)
+			//se habilitan las opciones inhabilitadas durante este mï¿½todo (Biclustering, GSEA, Diffexp y Build correl network)
 			ventana.getAnalysisMenuBiclustering().setEnabled(true);
 			ventana.getMenuAnalysisGSEA().setEnabled(true);
 			ventana.getMenuAnalysisDifexp().setEnabled(true);
@@ -2962,7 +2997,7 @@ public class ExpressionData {
 			minutos = calendario.get(Calendar.MINUTE);
 			segundos = calendario.get(Calendar.SECOND);
 			
-			System.out.println("EMPIEZA LA BÚSQUEDA DE LAS ANOTACIONES A LAS "+hora+":"+minutos+":"+segundos);
+			System.out.println("EMPIEZA LA Bï¿½SQUEDA DE LAS ANOTACIONES A LAS "+hora+":"+minutos+":"+segundos);
 			
 			// for(int g=0;g<genes.size();g++)
 			for (int g = 0; g < genes.length; g++) {
@@ -3075,7 +3110,7 @@ public class ExpressionData {
 			minutos = calendario.get(Calendar.MINUTE);
 			segundos = calendario.get(Calendar.SECOND);
 			
-			System.out.println("ACABA LA BÚSQUEDA DE LAS ANOTACIONES A LAS "+hora+":"+minutos+":"+segundos);
+			System.out.println("ACABA LA Bï¿½SQUEDA DE LAS ANOTACIONES A LAS "+hora+":"+minutos+":"+segundos);
 			
 			return galist;
 		}
@@ -3103,7 +3138,7 @@ public class ExpressionData {
 				geneAnnotations.notify();
 			}
 			
-			//se oculta la barra de progreso de la obtención de anotaciones
+			//se oculta la barra de progreso de la obtenciï¿½n de anotaciones
 			ventana.getMlpb().hide();
 		}
 
@@ -3276,12 +3311,12 @@ public class ExpressionData {
 		public int loadFromFile() {
 			int progress = 0;
 
-			// antes había esto
+			// antes habï¿½a esto
 			/*
 			 * String name = path.replace("\\", "/"); filePath = name;
 			 */
 			// modificado para que funcione en Windows (en principio en unix no
-			// dará problemas)
+			// darï¿½ problemas)
 			String name = file.getName();
 			//String name=path.replace("\\", "/");
 			filePath = path;
@@ -3320,7 +3355,7 @@ public class ExpressionData {
 							JOptionPane.ERROR_MESSAGE);
 					}});*/
 				message = "Error reading the file: " + e.getMessage();
-				//System.out.println("MicroArrayData en la excepción de error reading the file va a hacer setProgress(progress)="+progress+" y message="+message);
+				//System.out.println("MicroArrayData en la excepciï¿½n de error reading the file va a hacer setProgress(progress)="+progress+" y message="+message);
 				System.err.println(message);
 				setProgress(100);
 				return -1;
@@ -4068,10 +4103,10 @@ public class ExpressionData {
 	}
 
 	/**
-	 * Selecciona los genes con valor de expresi—n por encima de sdsAbove
-	 * desviaciones est‡ndar de la media para todas las condiciones etiquetadas
+	 * Selecciona los genes con valor de expresiï¿½n por encima de sdsAbove
+	 * desviaciones estï¿½ndar de la media para todas las condiciones etiquetadas
 	 * con el valor highEFV para el factor experimental highEF y por debajo de
-	 * sdsBelow desviaciones est‡ndar de la media para todas las condiciones
+	 * sdsBelow desviaciones estï¿½ndar de la media para todas las condiciones
 	 * etiquetadas con el valor lowEFV para el factor experimental lowEF highEF
 	 * or lowEF (but not both) can be "none333" if we only want to filter by one
 	 * condition. Example: we want to get every gene above 2 sd for "diseased"
@@ -4311,4 +4346,46 @@ public class ExpressionData {
 	public String getOrganism() {
 		return organism;
 	}
+
+	public void getGOEnrichment(ArrayList<GeneAnnotation> annot, int minAnnotations, int maxAnnotations, double minPvalue, String correction, GeneRequester gr, Point location, Analysis a, boolean showProgress) {
+		//TODO: this shoul be done as an annotation task
+		//0) Take number of occurrences if necessary (NOTE: occurences based in probes, no evidence filtering). Only for platform related experiments by now
+			//public void getTopGOEnrichment(LinkedList<Integer> genes,
+			//		GeneRequester gr, Point location, String ontology, Analysis a) {
+			ht=new EnrichmentTestTask(annot, (float)(minPvalue), correction, minAnnotations, maxAnnotations,a);
+			EnrichmentTestProgressMonitor hpm = null;
+			if(showProgress)
+				{
+				if (location != null)
+					hpm = new EnrichmentTestProgressMonitor(location);
+				else
+					hpm = new EnrichmentTestProgressMonitor(new Point(0, 0));
+				hpm.setTask(ht);
+				hpm.run();
+				}
+			else
+				ht.run();
+			/*					amd2 = new AnnotationProgressMonitor2(at.label);
+					amd2.setTask(at);
+					amd2.run();
+*/
+			
+			if (gr != null) {
+				geneRequester = gr;
+				Thread wt = new Thread() {
+					public void run() {
+						try 
+							{
+							geneRequester.receiveGOTerms(ht.get());
+							}
+						catch (Exception e) 
+							{
+							e.printStackTrace();
+							}
+						}
+					};
+				wt.start();
+				}
+
+			}
 }

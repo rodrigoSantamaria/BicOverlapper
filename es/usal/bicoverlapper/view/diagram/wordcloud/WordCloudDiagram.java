@@ -117,6 +117,10 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 
 	private boolean waitingEnrichment;
 
+	private boolean enrichmentFailed=false;
+
+	private boolean nothingEnriched=false;
+
 	public WordCloudDiagram(Session sesion, Dimension dim) {
 		super(new BorderLayout());//
 		int num = sesion.getNumWordClouds();
@@ -163,6 +167,9 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 		 * Changes color to the terms that are related to the hovered gene (only
 		 * if <200 genes are selected)
 		 */
+		nothingEnriched=false;
+		enrichmentFailed=false;
+		
 		if (sesion.isOnlyHover())
 			return;
 		if (sesion.getSelectedBicluster()==null || sesion.getSelectedGenesBicluster()==null || sesion.getSelectedGenesBicluster().size()==0 || sesion.isTooManyGenes()) {
@@ -223,7 +230,6 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 		}
 
 		//The annotations are not present, search for them
-//		if (reqSearch && (!innerCall || annot == null || (got == null && menuCloud.size.getSelectedIndex() == WordCloudParameterConfigurationPanel.PVALUES))) 
 		if (reqSearch && (!innerCall || annot == null || got == null || menuCloud.size.getSelectedIndex() == WordCloudParameterConfigurationPanel.PVALUES)) 
 			{
 			Point p = new Point(0, 0);
@@ -268,12 +274,16 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 				
 				//----- VIA TOPGO
 				//TODO: continue from here on -- trying pvals from topGO (faster? --> after the initial load)
-				final long t=System.currentTimeMillis();
-				this.sesion.getMicroarrayData().getTopGOEnrichment(sesion.getSelectedGenesBicluster(), this, p, ont, sesion.getAnalysis());
+				//final long t=System.currentTimeMillis();
+				//this.sesion.getMicroarrayData().getTopGOEnrichment(sesion.getSelectedGenesBicluster(), this, p, ont, sesion.getAnalysis());
 				//ArrayList<GOTerm> table=sesion.getAnalysis().goEnrichment(0.01,"BP", sesion.getMicroarrayData().getGeneNames(sesion.getSelectedBicluster().getGenes()));
 				//receiveGOTerms(table);
+				//System.out.println("Time in enrichment: "+(System.currentTimeMillis()-t));
+				
+				//------ VIA LOCAL
+				this.sesion.getMicroarrayData().getGOEnrichment(annot, 5, 500, new Float(menuCloud.alpha.getText()).floatValue(), menuCloud.correction.getSelectedItem().toString(), this, p, sesion.getAnalysis(), false);
 				//ArrayList<GOTerm> table=sesion.getAnalysis().goEnrichment(0.01,"BP", sesion.getMicroarrayData().getGeneNames(sesion.getSelectedBicluster().getGenes()));
-				System.out.println("Time in enrichment: "+(System.currentTimeMillis()-t));
+				//receiveGOTerms(table);
 				}
 			//Just search for annotations
 			else {
@@ -317,6 +327,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 	}
 
 	private void addWords() {
+		System.out.println("Adding WORDS");
 		long t1 = System.currentTimeMillis();
 		int cont = 0;
 		if (annot == null || annot.size() == 0) {
@@ -353,8 +364,6 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 								}
 								if (add) {
 									String desc = go.getTerm();
-								//	if(desc.contains("small GTPase"))
-									//	System.out.println("Adding desc "+desc);
 									if (!added.contains(desc)) {
 										splitAndAdd(desc, 1, 1,
 												this.colorSeleccion, true,
@@ -406,14 +415,16 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 					if (a.getGoTerms() != null && a.getGoTerms().size() > 0)
 						cont++;
 
-				for (GOTerm go : got) {
-					if (go != null) {
+				for (GOTerm go : got) 
+					{
+					if (go != null) 
+						{
 						String desc = go.getTerm();
 						double size = Math.abs(Math.log10(go.getPvalue()));
 						splitAndAdd(desc, go.getPvalue(), size,
 								this.colorSeleccion, false, null);
+						}
 					}
-				}
 				break;
 			}
 			break;
@@ -476,17 +487,36 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 		System.out.println("receiveGOTerms");
 		this.got = goterms;
 		waitingEnrichment=false;
-		
+		enrichmentFailed=false;
+		nothingEnriched=false;
 		if (got == null)
-			SwingUtilities.invokeLater(new Runnable() {
+			{
+			enrichmentFailed=true;
+			if(getGraphics()!=null)
+				{
+				drawFondo((Graphics2D)this.getGraphics());
+				drawText((Graphics2D)this.getGraphics(), "Enrichment failed.");
+				}
+			}
+			
+			/*SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 			
 				JOptionPane.showMessageDialog(null,
 						"ERROR: enrichemnt test could not be completed",
 						"Error", JOptionPane.ERROR_MESSAGE);
-				}});
+				}});*/
 		
-		if (got.size() == 0)
+		else if (got.size() == 0)
+			{
+			nothingEnriched=true;
+			if(getGraphics()!=null)
+				{
+				drawFondo((Graphics2D)this.getGraphics());
+				drawText((Graphics2D)this.getGraphics(), "No enriched terms found for the current selection.");
+				}
+			}
+			/*
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 			
@@ -495,7 +525,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 								+ (String) (menuCloud.ontology.getSelectedItem()),
 						"Warning", JOptionPane.WARNING_MESSAGE);
 				}});
-		
+				*/
 		addWords();
 	}
 
@@ -638,9 +668,9 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 	}
 
 	public void create() {
-		// add el display o papplet o frame de visualización a la ventana
+		// add el display o papplet o frame de visualizaciï¿½n a la ventana
 		// Asociar este panel a la ventana:
-		// Opcionalmente, se pueden inicializar aquí los datos del frame, en vez
+		// Opcionalmente, se pueden inicializar aquï¿½ los datos del frame, en vez
 		// de hacerlo en el constructor
 		this.getWindow().setContentPane(this);
 		this.getWindow().pack();
@@ -648,7 +678,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 
 	public void run() {
 		this.getWindow().setVisible(true); // show the window
-		// TODO: Lo necesario para que empiece a correr la visualización (p. ej.
+		// TODO: Lo necesario para que empiece a correr la visualizaciï¿½n (p. ej.
 		// en prefuse, los Visualization.run())
 	}
 
@@ -758,9 +788,9 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 		double posicionXWord, separacionXWord;
 		double xMaxima;
 		
-		//por defecto end está a true porque es posible que no se encuentren palabras a dibujar
-		//si no se tiene en cuenta esto se entraría en bucle infinito al incrementar la escala hasta infinito
-		//se pondrá end a false cuando se encuentra en "1) Primera vuelta" al menos una palabra
+		//por defecto end estï¿½ a true porque es posible que no se encuentren palabras a dibujar
+		//si no se tiene en cuenta esto se entrarï¿½a en bucle infinito al incrementar la escala hasta infinito
+		//se pondrï¿½ end a false cuando se encuentra en "1) Primera vuelta" al menos una palabra
 		boolean end = true;
 		boolean increase = false;
 
@@ -786,7 +816,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 			}
 
 		//System.out.println("First loop");
-		// 1) Primera vuelta, chequeamos el tamaño		
+		// 1) Primera vuelta, chequeamos el tamaï¿½o		
 		for (String w : sortedWords) {
 
 			//System.out.println("word = " + w);
@@ -794,7 +824,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 			Word nW = words.get(w);
 			if (w.length() > 0 && nW != null) {
 				
-				//al menos se ha encontrado una palabra, así que ya se podrá entrar al bucle que incrementa el tamaño
+				//al menos se ha encontrado una palabra, asï¿½ que ya se podrï¿½ entrar al bucle que incrementa el tamaï¿½o
 				end = false;
 								
 				String wc = "";
@@ -810,16 +840,16 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 				anchoTexto = texto.getBounds().getWidth() + separationSpace
 						* nW.size;
 				// si la palabra es mas ancha que el espacio disponible se pone
-				// a la izquierda del todo y se baja una línea
+				// a la izquierda del todo y se baja una lï¿½nea
 				if (x + anchoTexto > this.getWidth()) {
 					x = 0;
 					y += maxAlto;
 					maxAlto = altoTexto;
 				}
-				// se actualiza el valor de la altura máxima
+				// se actualiza el valor de la altura mï¿½xima
 				if (maxAlto < altoTexto)
 					maxAlto = altoTexto;
-				// se actualiza el valor de la anchura máxima
+				// se actualiza el valor de la anchura mï¿½xima
 				if (maxAncho < anchoTexto)
 					maxAncho = anchoTexto;
 				nW.setX(x);
@@ -832,7 +862,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 					x += anchoTexto;
 
 				// Carlos
-				// no sé muy bien las consecuencias de esto, porque en principio
+				// no sï¿½ muy bien las consecuencias de esto, porque en principio
 				// es que la palabra es demasiado ancha para la ventana...
 				// para esto ya se ha introducido el xMaxima
 				if (anchoTexto > this.getWidth()) {
@@ -841,18 +871,18 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 				}
 			}
 		}
-		y += maxAlto;// Si no el último salto no se tiene en cuenta.
+		y += maxAlto;// Si no el ï¿½ltimo salto no se tiene en cuenta.
 
 		// 2) Determinamos el factor de escala
 		//System.out.println("2) Determine scale factor");
 
 		double scale = Math.min(this.getHeight() / y, this.getWidth() / maxAncho);
 		
-		//sólo para probar por qué sale infinity
+		//sï¿½lo para probar por quï¿½ sale infinity
 		double scaleInicial = scale;
 
-		// 3) Segunda vuelta vuelta, con los tamaños adecuados
-		// como puede haber saltos de línea por el escalado, lo hacemos en un
+		// 3) Segunda vuelta vuelta, con los tamaï¿½os adecuados
+		// como puede haber saltos de lï¿½nea por el escalado, lo hacemos en un
 		// bucle donde vamos disminuyendo poco a poco la escala
 		System.out.println("3) 2nd loop");
 		// boolean increaseAnt=increase;
@@ -863,7 +893,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 
 		maxAncho = 0;
 
-		// 3) Calculamos el tamaño del as palabras
+		// 3) Calculamos el tamaï¿½o del as palabras
 		System.out.println("3) Determine words size");		
 		do {
 			// en cada vuelta se actualiza la xMaxima
@@ -891,10 +921,10 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 
 					if (x + anchoTexto > this.getWidth()) // change to next line
 					{
-						// Sumamos a todas las de la línea anterior el maxAlto
-						// de esa línea
-						// de esta forma no se intercalarán las alturas y todas
-						// las de la línea siguiente empezarán a la misma altura
+						// Sumamos a todas las de la lï¿½nea anterior el maxAlto
+						// de esa lï¿½nea
+						// de esta forma no se intercalarï¿½n las alturas y todas
+						// las de la lï¿½nea siguiente empezarï¿½n a la misma altura
 						for (int k = 0; k < wordsInLine.size(); k++) {
 							Word w2 = wordsInLine.get(k);
 							w2.setY(w2.getY() + .75 * maxAlto);
@@ -920,7 +950,7 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 					// si se desea posicionar la palabra en el centro de todo el
 					// espacio reservado en anchoTexto en vez de dejar todo el
 					// espacio a la derecha
-					// se colocará la coordenada X de la palabra en
+					// se colocarï¿½ la coordenada X de la palabra en
 					// posicionXWord
 					// si se desea dejar a la izquierda y todo el espacio
 					// sobrante a la derecha, basta con hacer nW.setX(x);
@@ -928,24 +958,24 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 					posicionXWord = x + (separacionXWord / 2);
 
 					nW.setX(posicionXWord);
-					nW.setY(y);// debería ser directamente +maxAlto, pero no
-								// queda bien y no sé por qué.
-								// luego está el tema de que cuando se está
+					nW.setY(y);// deberï¿½a ser directamente +maxAlto, pero no
+								// queda bien y no sï¿½ por quï¿½.
+								// luego estï¿½ el tema de que cuando se estï¿½
 								// viendo una, si luego hay otra mayor, no va a
 								// tener en cuenta el maxAlto total.
-								// habría que ir guardando todas las que van en
-								// una línea y luego sumarlas a todas el
-								// maxAlto, durante el cambio de línea
+								// habrï¿½a que ir guardando todas las que van en
+								// una lï¿½nea y luego sumarlas a todas el
+								// maxAlto, durante el cambio de lï¿½nea
 					nW.setText(texto);
 					nW.label = w;
 					wordsInLine.add(nW);
 					x += anchoTexto;
 				}
 			}
-			y += maxAlto;// si no la última línea no se tiene en cuenta
-			for (int i = 0; i < wordsInLine.size(); i++)// y recolocación por el
-														// tamaño máximo tb en
-														// la última línea
+			y += maxAlto;// si no la ï¿½ltima lï¿½nea no se tiene en cuenta
+			for (int i = 0; i < wordsInLine.size(); i++)// y recolocaciï¿½n por el
+														// tamaï¿½o mï¿½ximo tb en
+														// la ï¿½ltima lï¿½nea
 			{
 				Word w2 = wordsInLine.get(i);
 				w2.setY(w2.getY() + .75 * maxAlto);
@@ -976,13 +1006,13 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 				if (increase) {
 					
 					if(scale*1.5 == Double.POSITIVE_INFINITY){
-			//			System.out.println("\n\n\n\n\n\nPOSITIVE_INFINITY ALCANZADO AL HACER scale*1.5 y scale valía "+scale);
+			//			System.out.println("\n\n\n\n\n\nPOSITIVE_INFINITY ALCANZADO AL HACER scale*1.5 y scale valï¿½a "+scale);
 					}
 					
 					scale *= 1.5;
 				} else {
 					if(scale/1.2 == Double.POSITIVE_INFINITY){
-			//			System.out.println("\n\n\n\n\n\nPOSITIVE_INFINITY ALCANZADO AL HACER scale/1.2 y scale valía "+scale);
+			//			System.out.println("\n\n\n\n\n\nPOSITIVE_INFINITY ALCANZADO AL HACER scale/1.2 y scale valï¿½a "+scale);
 					}					
 					
 					scale /= 1.2;
@@ -1008,6 +1038,11 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 			drawText((Graphics2D) g, "Too many elements selected for this view");
 		else if(waitingEnrichment)
 			drawText((Graphics2D) g, "Performing statistical enrichment (it might take a while)...");
+		else if(enrichmentFailed)
+			drawText((Graphics2D) g, "Estatistical enrichment failed");
+		else if(nothingEnriched)
+			drawText((Graphics2D) g, "No enriched terms found for the current selection");
+			
 		else if(words==null || words.size()==0)
 			drawText((Graphics2D) g, "No annotations found for the selected elements");
 		else
@@ -1127,8 +1162,6 @@ public class WordCloudDiagram extends Diagram implements ChangeListener,
 
 			JPanel panelColor = this.getPanelPaleta(paleta, textoLabel,
 					muestraColor);
-			// JPanel panelParametros=new
-			// WordCloudParameterConfigurationPanel(this);
 			JPanel panelParametros = menuCloud;
 			this.setPanelParametros(panelParametros);
 			JPanel panelBotones = this.getPanelBotones(gestor);

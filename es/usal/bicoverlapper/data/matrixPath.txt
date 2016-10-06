@@ -1,1 +1,1 @@
-/Users/rodri/Documents/investigacion/publications/BicOverlapper2/imgTests/SyntrenEcoli.txt
+/Users/rodri/Documents/investigacion/distros/bicoverlapper1-4/data/prostate/GSE3325-edited.txt

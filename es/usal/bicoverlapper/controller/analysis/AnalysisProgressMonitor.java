@@ -204,7 +204,7 @@ public class AnalysisProgressMonitor extends JPanel implements ActionListener,
 						(String) params.get(1), ((Boolean) params.get(2)).booleanValue());
 				break;
 			case TOPGO_TEST:
-				ArrayList<GOTerm> list=b.goEnrichment((Double) params.get(0), (String) params.get(1), (ArrayList<String>) (params.get(2)));
+				ArrayList<GOTerm> list=b.topGOenrichment((Double) params.get(0), (String) params.get(1), (ArrayList<String>) (params.get(2)));
 				//TODO: serialize and save on a res file: 'got.tmp'
 				res="got.tmp";
 				try{

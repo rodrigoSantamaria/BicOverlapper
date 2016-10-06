@@ -121,8 +121,7 @@ public class DiffExpPanel extends javax.swing.JFrame {
 					public void actionPerformed(java.awt.event.ActionEvent e) {
 						String ef1 = null;
 						String efv1 = null;
-						boolean ne1 = false;
-
+						
 						//NO GROUP SELECTED
 						if (null == group1.getSelectedValue()
 								|| null == group2.getSelectedValue()) {
@@ -159,7 +158,6 @@ public class DiffExpPanel extends javax.swing.JFrame {
 						//EF1 is REST
 						if (g1.equals("rest")) {
 							ef1 = efv1 = "rest";
-							ne1 = true;
 						}// 4), 4b)
 						else {
 							efv1 = g1.toString().trim();
@@ -178,13 +176,11 @@ public class DiffExpPanel extends javax.swing.JFrame {
 						}
 						String ef2 = null;
 						String efv2 = null;
-						boolean ne2 = false;
 						
 						//EF2 is REST
 						if (g2.equals("rest")) {
 							ef2 = "rest";
 							efv2 = "rest";
-							ne2 = true;
 						} else {
 							efv2 = g2.toString().trim();
 							for (int i = group2.getSelectedIndex(); i >= 0; i--) {
@@ -218,6 +214,9 @@ public class DiffExpPanel extends javax.swing.JFrame {
 						case 1:
 							reg = "down";
 							break;
+						case 2:
+							reg = "all";
+							break;
 						default:
 							reg = "all";
 							break;
@@ -240,7 +239,7 @@ public class DiffExpPanel extends javax.swing.JFrame {
 						//--------------------------------------------------
 						//----------    1 EVERY COMBINATION OF AN EF -------
 						//--------------------------------------------------
-						if (ef1.equals(ef2) && efv1.equals(efv2)) 
+						if (ef1.equals(ef2) && efv1.equals(efv2) && group1.getSelectedIndices().length==1 && group2.getSelectedIndices().length==1) 
 							{
 							// 7) Same ef, do every possible combination
 							System.out.println("Same EF case");
@@ -420,6 +419,14 @@ public class DiffExpPanel extends javax.swing.JFrame {
 							wt.start();
 							setVisible(false);
 						}
+						//Several EFVs selected, but not all
+						else if(!ef1.equals("Sample names") && !ef2.equals("Sample names"))
+							{
+							System.out.println("---->Several EFVs selected, but not all");
+							//TODO: create method in Analysis.java to call diffAnalysisEFsel
+
+							setVisible(false);
+							}
 						//--------------------------------------------------
 						//----------    4 Sample names as replicates -------
 						//--------------------------------------------------
@@ -603,13 +610,15 @@ public class DiffExpPanel extends javax.swing.JFrame {
 			{
 				expressionValue = new JTextField();
 				getContentPane().add(expressionValue);
-				expressionValue.setText("2.0");
+				expressionValue.setText(""+(double)Math.round(session.getMicroarrayData().sd * 20) / 10);
 				expressionValue.setBounds(205, 54, 43, 21);
+				expressionValue.setToolTipText("Default value is two std. deviations");
 			}
 			{
 				ComboBoxModel regulationModel = new DefaultComboBoxModel(
 						new String[] { "up regulated in group 1",
-								"down regulated in group 1" });
+								"down regulated in group 1",
+								"up or down regulated in group 1"});
 				regulation = new JComboBox();
 				getContentPane().add(regulation);
 				regulation.setModel(regulationModel);

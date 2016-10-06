@@ -29,31 +29,40 @@
 #
 # Author: Rodrigo Santamar’a rodri@usal.es
 ###############################################################################
-diffAnalysis2=function(mt, g1, nameG1="Group 1", g2, nameG2="Group 2", interestingNames=c(), pvalT=7, diffT=0.2, byRank=FALSE, numRank=50, BH.correct=TRUE, print=TRUE, return ="all")
+diffAnalysis2=function(mt, g, g1="Group 1", g2, interestingNames=c(), pvalT=7, diffT=0.2, byRank=FALSE, numRank=50, adjustMethod="BH", BH.correct=TRUE, print=TRUE, return ="all", colorPoints="black", differentialHighlight=TRUE, significantHighlight=TRUE, namesHighlight=TRUE, lines=TRUE)
 {
-	Difference <- rowMeans(mt[,g1, drop=FALSE])-rowMeans(mt[,g2, drop=FALSE])#Ratio of expression of good prognosis against bad prognosis
-	Average <- rowMeans(mt[,union(g1,g2)])
+	Difference <- rowMeans(mt[,grep(g1, g), drop=FALSE])-rowMeans(mt[,grep(g2,g), drop=FALSE])#Ratio of expression of good prognosis against bad prognosis
+	#Average <- rowMeans(mt[,union(g1,g2)])
 		
 	#Limma analysis
-	library(limma)
-	population.groups=factor(c(rep(nameG1, length(g1)),c(rep(nameG2, length(g2)))))
-	design=model.matrix(~population.groups)
-	fit=lmFit(mt[, union(g1,g2)], design)
-	fit
-	#proportion -	numeric value between 0 and 1, assumed proportion of genes which are differentially expressed (def 0.01)
-	#stdev.coef.lim -	numeric vector of length 2, assumed lower and upper limits for the standard deviation of log2-fold-changes for differentially expressed genes (def. 0.1-4)
-	fit.eBayes=eBayes(fit)
-	#lodd <- -log10 (fit.eBayes$p.value[,2])
-	lodd =  -log10(topTable(fit.eBayes, sort.by="none", number=dim(mt)[1])[,"adj.P.Val"])
+	require(limma)
+	population.groups=factor(make.names(g))
+	design=model.matrix(~0+population.groups)
+	colnames(design)=levels(population.groups)
+	fit=lmFit(mt, design)
+	
+	#trick to be able to use parameters as values for expression
+	mycontrast=paste(make.names(g1),"-",make.names(g2), sep="")
+	cmd <- paste("contrasts <- makeContrasts(", mycontrast, ", levels = design)", sep ='"')
+	eval(parse(text = cmd))	
+	
+	fit2=contrasts.fit(fit, contrasts)
+	fit2.eBayes=eBayes(fit2)
+	
+	
+	lodd =  -log10(topTable(fit2.eBayes, sort.by="none", number=dim(mt)[1])[,"adj.P.Val"])
+	names(lodd)=rownames(mt)
 	if(byRank==FALSE)
 		{
+		tt=topTable(fit2.eBayes, p.value=pvalT, adjust=adjustMethod, lfc=diffT, number=dim(mt)[1])
 		o1=which(abs(Difference)>diffT)
-		oo2=which(lodd>pvalT)
+		oo2=which(lodd>-log10(pvalT))
 		}
 	else
 		{
 		o1 <- order(abs(Difference),decreasing=TRUE)[1:numRank]
-		oo2 <- order(abs(fit.eBayes$t[,2]),decreasing=TRUE)[1:numRank]
+		oo2 <- order(abs(fit2.eBayes$t[,2]),decreasing=TRUE)[1:numRank]
+		tt=topTable(fit2.eBayes, adjust=adjustMethod, lfc=difft, number=numRank)
 		}
 	
 	oo <- union(o1,oo2)
@@ -63,29 +72,32 @@ diffAnalysis2=function(mt, g1, nameG1="Group 1", g2, nameG2="Group 2", interesti
 		plot(Difference,lodd,cex=.25,
 				xlim=range(Difference), #c(-2,3),
 				ylim=range(lodd),xlab="Average (log) Fold-Change",
-				ylab="LOD score - Negative log 10 of P-value")
-		points(Difference[o1],lodd[o1],pch=18,col="blue",cex=1.5) 
-		points(Difference[oo2],lodd[oo2],pch=1,col="red",cex=2,lwd=2) 
-		points(Difference[interestingNames],lodd[interestingNames],pch=1,col="red",cex=2,lwd=2) 
-		if(byRank==FALSE)
+				ylab="LOD score - Negative log 10 of P-value", col=colorPoints)
+		if(differentialHighlight)	points(Difference[o1],lodd[o1],pch=18,col="blue",cex=1.5) 
+		if(significantHighlight)	points(Difference[oo2],lodd[oo2],pch=1,col="red",cex=2,lwd=2) 
+		points(Difference[interestingNames],lodd[interestingNames],pch=1,col="red",cex=2,lwd=2)
+		if(lines)
 			{
-			abline(h=pvalT,col="green")
-			abline(v=diffT,col="red")
-			abline(v=-diffT,col="red")
+			if(byRank==FALSE)
+				{
+				abline(h=-log10(pvalT),col="green")
+				abline(v=diffT,col="red")
+				abline(v=-diffT,col="red")
+				}
+			else
+				{
+				print(paste("max o1",max(Difference[which(Difference[ii]<0)]), "min o1", min(Difference[which(Difference[ii]>0)]), "min oo2", min(lodd[ii])))
+				abline(h=min(lodd[ii]),col="green")
+				abline(v=max(Difference[intersect(ii, which(Difference<0))]),col="red")
+				abline(v=min(Difference[intersect(ii, which(Difference>0))]),col="red")
+				}
 			}
-		else
-			{
-			print(paste("max o1",max(Difference[which(Difference[ii]<0)]), "min o1", min(Difference[which(Difference[ii]>0)]), "min oo2", min(lodd[ii])))
-			abline(h=min(lodd[ii]),col="green")
-			abline(v=max(Difference[intersect(ii, which(Difference<0))]),col="red")
-			abline(v=min(Difference[intersect(ii, which(Difference>0))]),col="red")
-			}
-		title(paste("Volcano plot: ", nameG1, "vs.", nameG2))
-		text(Difference[ii], lodd[ii], labels=rownames(mt)[ii], cex=0.5, pos=3)
+		title(paste("Volcano plot: ", g1, "vs.", g2))
+		if(namesHighlight)	text(Difference[ii], lodd[ii], labels=rownames(mt)[ii], cex=0.5, pos=3)
 		if(length(interestingNames)>0)	text(Difference[interestingNames], lodd[interestingNames], labels=rownames(mt)[interestingNames], cex=0.5, pos=3, col="red")
 		}
 	if(return=="all")
-		ii
+		list(ids=ii, dif=Difference, pval=lodd)
 	else
 		{
 		if(return=="up")
@@ -106,7 +118,7 @@ diffAnalysis2=function(mt, g1, nameG1="Group 1", g2, nameG2="Group 2", interesti
 # g - experimental factor values (for example: "0 min", "0 min", "60 min", "60 min", "180 min", "180 min")
 # g1 - first group name (for example "0 min")
 # g2 - second group name ("for example "180 min")
-diffAnalysis=function(mt, g, g1, g2, pvalT=0.01, diffT=0, adjustMethod="BH", byRank=FALSE, numRank=50, return ="all")
+diffAnalysis=function(mt, g, g1, g2, pvalT=0.01, diffT=0, adjustMethod="BH", byRank=FALSE, numRank=50, return ="all", retType="names")
 	{
 		#Limma analysis
 		require(limma)
@@ -132,36 +144,44 @@ diffAnalysis=function(mt, g, g1, g2, pvalT=0.01, diffT=0, adjustMethod="BH", byR
 			{
 			degs=as.numeric(rownames(tt))
 			if(return=="all" || dim(tt)[1]==0) 
-				degs
+				if(retType=="names")	degs
+				else					tt
 			else
 				{
 				if(return=="up")
 					{
-					degs[which(tt[,"logFC"]>0)]	
+					if(retType=="names")	degs[which(tt[,"logFC"]>0)]
+					else					tt[which(tt[,"logFC"]>0),]
 					}
 				else
 					{
-					degs[which(tt[,"logFC"]<0)]	
+					if(retType=="names")	degs[which(tt[,"logFC"]<0)]	
+					else					tt[which(tt[,"logFC"]<0),]
 					}
 				}		
 			}
 		else	#limma on R 3.0 (no ID column, text rownames)
 			{
 			if(return=="all" || dim(tt)[1]==0) 
-				which(rownames(mt) %in% rownames(tt))
+				if(retType=="names")	which(rownames(mt) %in% rownames(tt))
+				else					tt
 			else
 				{
 				if(return=="up")
 				   {
-				   which(rownames(mt) %in% rownames(tt[which(tt[,"logFC"]>0),]))
+				   if(retType=="names")	which(rownames(mt) %in% rownames(tt[which(tt[,"logFC"]>0),]))
+				   else					tt[which(tt[,"logFC"]>0),]
 			       }
 				else
 				   {
-				   which(rownames(mt) %in% rownames(tt[which(tt[,"logFC"]<0),]))
+				   if(retType=="names")	which(rownames(mt) %in% rownames(tt[which(tt[,"logFC"]<0),]))
+				   else					tt[which(tt[,"logFC"]>0),]
 			       }
 				}
 			}
 	}
+	
+	
 	
 # Like above, but in this case several differential expression analyses are performed, 
 # between a target experimental factor value (efv) and every efv in its experimental 
@@ -198,15 +218,17 @@ diffAnalysisEF=function(m, ef, efv, interestingNames=c(),
 # As above, but in this case every possible differential expression analysis is performed, 
 # between every combination of efvs for a given ef
 # ef - character array with the efv for each sample (column) in matrix m (e.g. healthy healthy cancer1 cancer1 cancer2 cancer2)
-# Returns a list of arrays with the DEGs on each of these comparisons
+# retType - Returns a list of arrays with the DEGs on each of these comparisons ("names") or a table from limma with logFC, p-values, etc ("table")
+
 # TODO: Grep errors with expression symbols (e.g. "CD14+ mo" because of the +)
 diffAnalysisEFall=function(m, ef, interestingNames=c(),
-			pvalT=7, diffT=0.8, byRank=FALSE, numRank=50, return ="all")
+			pvalT=7, diffT=0.8, byRank=FALSE, numRank=50, return ="all", retType="names")
 	{
 		conds=unique(ef)
 		
 		#1) perform differential expression analysis
-		degs=lapply(conds, function(x)
+		if(return!="all")
+			degs=lapply(conds, function(x)
 					{
 					g1=grep(paste("^",x,"$",sep=""),ef)
 					lapply(conds[-which(conds==x)], function(y)
@@ -215,26 +237,54 @@ diffAnalysisEFall=function(m, ef, interestingNames=c(),
 						print(paste(x,"vs",y))
 						print(g1)
 						print(g2)
-						rownames(m)[diffAnalysis(m, g=ef,g1=x, g2=y, pvalT=pvalT, diffT=diffT, return=return)]
+						if(retType=="names")	rownames(m)[diffAnalysis(m, g=ef,g1=x, g2=y, pvalT=pvalT, diffT=diffT, return=return, retType=retType)]
+						else					diffAnalysis(m, g=ef,g1=x, g2=y, pvalT=pvalT, diffT=diffT, return=return, retType=retType)
 						})
 					})
+		else
+			{
+			degs=lapply(1:(length(conds)-1), function(xi)
+				{
+				x=conds[xi]
+				lapply((xi+1):length(conds), function(yi)
+						{
+						y=conds[yi]
+						print(paste(x,"vs",y))
+						if(retType=="names")	rownames(m)[diffAnalysis(m, g=ef,g1=x, g2=y, pvalT=pvalT, diffT=diffT, return=return, retType=retType)]
+						else					diffAnalysis(m, g=ef,g1=x, g2=y, pvalT=pvalT, diffT=diffT, return=return, retType=retType)
+					})
+				})
+			}
 			
 	 #2) set names for each group
-	names=lapply(conds, function(x)
-			{
+	if(return!="all")
+		names=lapply(conds, function(x)
+				{
 				lapply(conds[-which(conds==x)], function(y)
 						{
 						paste(x,"vs",y)
 						})
-			})
-	
+				})
+	else
+		{
+		names=lapply(1:(length(conds)-1), function(xi)
+				{
+				x=conds[xi]
+				lapply((xi+1):length(conds), function(yi)
+						{
+						y=conds[yi]
+						paste(x,"vs",y)
+						})
+				})
+		}
 	#3) Unlist the second level of the list, give names, return
 	dl=list()
 	for(i in degs)
 		{
 			for(j in i)
 			{
-				dl=c(dl,list(j))
+			if(retType=="names")	dl=c(dl,list(j))
+			else					dl=c(dl,list(as.matrix(j)))
 			}
 		}
 	ret=c()
@@ -244,6 +294,58 @@ diffAnalysisEFall=function(m, ef, interestingNames=c(),
 	}
 
 
+# As above, but in this case se select just a list of EFVs in which to do the combinations between 
+# between every combination of efvs for a given ef
+# ef - character array with the efv for each sample (column) in matrix m (e.g. healthy healthy cancer1 cancer1 cancer2 cancer2)
+# efv1 - list with the efvs to compare against all the efvs on efv2 (e.g. c("healthy"))
+# efv2 - list with the efvs to be compared against all the efvs on efv1 (e.g. c("cancer1", "cancer2"))
+# Returns a list of arrays with the DEGs on each of these comparisons
+# TODO: Grep errors with expression symbols (e.g. "CD14+ mo" because of the +)
+diffAnalysisEFsel=function(m, ef, efv1=c(), efv2=c(), interestingNames=c(),
+			pvalT=7, diffT=0.8, byRank=FALSE, numRank=50, return ="all")
+	{
+		conds1=unique(efv1)
+		conds2=unique(efv2)
+		
+		#1) perform differential expression analysis
+		degs=lapply(conds1, function(x)
+				{
+				conds2t=conds2
+				if(length(grep(x,conds2))==1)
+					conds2t=conds2t[-grep(x,conds2)]
+				g1=grep(paste("^",x,"$",sep=""),ef)
+				lapply(conds2t, function(y)
+						{
+							g2=grep(paste("^",y,"$",sep=""),ef)
+							print(paste(x,"vs",y))
+							print(g1)
+							print(g2)
+							rownames(m)[diffAnalysis(m, g=ef,g1=x, g2=y, pvalT=pvalT, diffT=diffT, return=return)]
+						})
+				})
+		#2) set names for each group
+		names=lapply(conds1, function(x)
+				{
+					lapply(conds2, function(y)
+							{
+								paste(x,"vs",y)
+							})
+				})
+		#3) Unlist the second level of the list, give names, return
+		dl=list()
+		for(i in degs)
+		{
+			for(j in i)
+			{
+				dl=c(dl,list(j))
+			}
+		}
+		ret=c()
+		ret$names=unlist(names)
+		ret$degs=dl
+		ret	
+	}
+	
 # As above, but in this case every possible differential expression analysis is performed, 
 # between every combination of efvs for A LIST OF EFS
 # ef - list of character arrays. Each character array corresponds to the efvs for a given ef, for each sample (column) in matrix m (e.g. healthy healthy cancer1 cancer1 cancer2 cancer2)

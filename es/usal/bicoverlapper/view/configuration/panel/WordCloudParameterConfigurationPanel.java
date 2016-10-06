@@ -9,6 +9,8 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 
 import es.usal.bicoverlapper.view.diagram.wordcloud.WordCloudDiagram;
+import java.awt.Dimension;
+import javax.swing.JTextField;
 
 /**
  * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
@@ -58,6 +60,8 @@ public class WordCloudParameterConfigurationPanel extends javax.swing.JPanel
 	public static final int BP = 1;
 	public static final int MF = 2;
 	public static final int CC = 3;
+	public JTextField alpha;
+	public JComboBox correction;
 
 	public WordCloudParameterConfigurationPanel(WordCloudDiagram wc) {
 		super();
@@ -68,7 +72,7 @@ public class WordCloudParameterConfigurationPanel extends javax.swing.JPanel
 	private void initGUI() {
 		try {
 			this.setLayout(null);
-			this.setPreferredSize(new java.awt.Dimension(405, 83));
+			this.setPreferredSize(new Dimension(405, 122));
 			texts = new String[] { "definition", "go term", "kegg path" };
 			splits = new String[] { "1 word", "2 words", "complete" };
 			sizes = new String[] { "occurrence", "p-value" };
@@ -79,21 +83,21 @@ public class WordCloudParameterConfigurationPanel extends javax.swing.JPanel
 				text = new JComboBox();
 				this.add(text);
 				text.setModel(comboTextModel);
-				text.setBounds(76, 10, 97, 22);
+				text.setBounds(12, 30, 97, 22);
 			}
 			{
 				ComboBoxModel jComboBox1Model = new DefaultComboBoxModel(splits);
 				split = new JComboBox();
 				this.add(split);
 				split.setModel(jComboBox1Model);
-				split.setBounds(75, 43, 99, 22);
+				split.setBounds(12, 81, 99, 22);
 			}
 			{
 				ComboBoxModel jComboBox1Model = new DefaultComboBoxModel(sizes);
 				size = new JComboBox();
 				this.add(size);
 				size.setModel(jComboBox1Model);
-				size.setBounds(282, 10, 101, 22);
+				size.setBounds(121, 30, 101, 22);
 			}
 			{
 				ComboBoxModel jComboBox1Model = new DefaultComboBoxModel(
@@ -101,7 +105,7 @@ public class WordCloudParameterConfigurationPanel extends javax.swing.JPanel
 				ontology = new JComboBox();
 				this.add(ontology);
 				ontology.setModel(jComboBox1Model);
-				ontology.setBounds(283, 43, 101, 22);
+				ontology.setBounds(121, 81, 101, 22);
 			}
 			{
 				labelText = new JLabel();
@@ -115,21 +119,21 @@ public class WordCloudParameterConfigurationPanel extends javax.swing.JPanel
 				jLabel1 = new JLabel();
 				this.add(jLabel1);
 				jLabel1.setText("Split:");
-				jLabel1.setBounds(12, 45, 64, 19);
+				jLabel1.setBounds(12, 64, 64, 19);
 				jLabel1.setToolTipText("Split text into single or double words, or do not split it");
 			}
 			{
 				jLabel2 = new JLabel();
 				this.add(jLabel2);
 				jLabel2.setText("Size:");
-				jLabel2.setBounds(200, 12, 64, 19);
+				jLabel2.setBounds(129, 11, 64, 19);
 				jLabel2.setToolTipText("Size of the words is determined by the number of elements sharing it or by its statistical significance");
 			}
 			{
 				jLabel3 = new JLabel();
 				this.add(jLabel3);
 				jLabel3.setText("Ontology:");
-				jLabel3.setBounds(201, 45, 82, 19);
+				jLabel3.setBounds(123, 64, 82, 19);
 				jLabel3.setToolTipText("In the case that GO terms are selected, which ontology to use");
 			}
 
@@ -141,6 +145,28 @@ public class WordCloudParameterConfigurationPanel extends javax.swing.JPanel
 			split.addActionListener(this);
 			size.addActionListener(this);
 			ontology.addActionListener(this);
+			
+			JLabel lblAlpha = new JLabel();
+			lblAlpha.setToolTipText("Significance threshold (only if size=p-value)");
+			lblAlpha.setText("Alpha:");
+			lblAlpha.setBounds(234, 12, 64, 19);
+			add(lblAlpha);
+			
+			alpha = new JTextField();
+			alpha.setText("0.01");
+			alpha.setBounds(234, 27, 64, 26);
+			add(alpha);
+			alpha.setColumns(10);
+			
+			JLabel lblCorrection = new JLabel("Correction:");
+			lblCorrection.setBounds(237, 65, 82, 16);
+			add(lblCorrection);
+			
+			correction = new JComboBox();
+			correction.setModel(new DefaultComboBoxModel(new String[] {"fdr", "fwer", "bonferroni"}));
+			correction.setToolTipText("Multiple hypothesis correction to apply to the enrichmente (only if size=p-vale)");
+			correction.setBounds(234, 79, 85, 27);
+			add(correction);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -188,5 +214,4 @@ public class WordCloudParameterConfigurationPanel extends javax.swing.JPanel
 		}
 		antName = (String) cb.getSelectedItem();
 	}
-
 }

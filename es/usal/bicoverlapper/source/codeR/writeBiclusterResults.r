@@ -168,7 +168,7 @@ writeBiclusterResultsFromList=function(fileName, listRows, listColumns=NA, bicNa
 #	  groups
  # 	}
 	
-readGroups=function(file=NA)
+readGroups=function(file=NA, onlyGenes=TRUE)
 	{
 		if(is.na(file))
 			stop("Error: a file name should be provided")
@@ -177,8 +177,11 @@ readGroups=function(file=NA)
 		names=gsub(" ?: ?.*$", "", text[locs])
 		starts=locs+1
 		groups=strsplit(text[starts], "\t")
-		starts=locs+2
-		groups=c(groups,strsplit(text[starts], "\t"))
+		if(onlyGenes==FALSE)
+			{
+			starts=locs+2
+			groups=c(groups,strsplit(text[starts], "\t"))
+			}
 		names(groups)=names
 		groups
 	}
