@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>BicOverlapper</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>de.walware.statet.r.builders.RSupport</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.eclipse.jem.beaninfo.BeanInfoNature</nature>
+		<nature>de.walware.statet.base.StatetNature</nature>
+		<nature>de.walware.statet.r.RNature</nature>
+	</natures>
+	<variableList>
+		<variable>
+			<name>R_HOME</name>
+			<value>file:/Library/Frameworks/R.framework/Versions/2.11/Resources</value>
+		</variable>
+	</variableList>
+</projectDescription>

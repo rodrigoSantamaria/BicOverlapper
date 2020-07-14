@@ -47,7 +47,7 @@ import es.usal.bicoverlapper.view.diagram.overlapper.Overlapper;
  * "resultType" - name of the buicluster set from which the bicluster of this
  * bubble comes (String)
  * 
- * @author Rodrigo Santamaría
+ * @author Rodrigo Santamarï¿½a
  */
 
 public class GroupsData {
@@ -94,7 +94,7 @@ public class GroupsData {
 		int contc = 0;
 		Bubble b = null;
 
-		//Carlos, para contar el número diferentes de genes
+		//Carlos, para contar el nï¿½mero diferentes de genes
 		Set<String> genesLeidos = new HashSet<String>();
 		
 		maxHomogeneity = -1;
@@ -102,8 +102,9 @@ public class GroupsData {
 		boolean areGenes = true;
 		boolean isSize = true;
 		boolean skipNext = false;
+		boolean conditionNext = false;
 		cont = 0;
-		cad = br.readLine(); // La primera línea contiene el número de
+		cad = br.readLine(); // La primera lï¿½nea contiene el nï¿½mero de
 								// biclusters
 
 		int matches=0; //to check how many genes of the groups are on expression data, if loaded
@@ -114,18 +115,22 @@ public class GroupsData {
 		long t0=System.currentTimeMillis();
 		while ((cad = br.readLine()) != null) {
 			StringTokenizer st = new StringTokenizer(cad, "\t");
-			if (st.countTokens() == 1 && !skipNext) {
+			if (st.countTokens() == 1 && !skipNext && !conditionNext) {
 				method = st.nextToken();
 				numberOfMethods++;
+				System.out.println("-----------METHOD------------" + numberOfMethods);
 			} else {
 				skipNext = false;
+				conditionNext=false;
 				if (isSize)// size info, no interesa
 				{
 					isSize = false;
 					b = new Bubble();
 										
 					if (cad.contains(":")){
-						//antes estaba así
+					//if (cad.split("\t")[0].contains(":")){
+						System.out.println("Cad containing :"+ cad);
+							//antes estaba asï¿½
 						StringTokenizer stAux = new StringTokenizer(cad, ":");
 						b.setName(stAux.nextToken());
 					//	System.out.println(b.getName());
@@ -136,14 +141,16 @@ public class GroupsData {
 					cont++;
 				} else {
 					if (areGenes) {
+						//skipNext=true;
+						conditionNext=true;
 						while (st.hasMoreTokens()) {
 							String c = st.nextToken();
 							b.getGenes().add(c);
 						//	System.out.println(c);
-							//se controla el número de genes leídos
+							//se controla el nï¿½mero de genes leï¿½dos
 							genesLeidos.add(c);
-							//en caso de superar una determinada cifra y de no estar notificado, se notificará en la sesión
-							//pero se seguirá leyendo
+							//en caso de superar una determinada cifra y de no estar notificado, se notificarï¿½ en la sesiï¿½n
+							//pero se seguirï¿½ leyendo
 							if(!sesion.isTooManyGenes() && genesLeidos.size() > Session.MAX_GENES){
 								sesion.setTooManyGenes(true);
 								System.out.println("\n\nToo many genes for some visualizations\n\n");
@@ -207,12 +214,13 @@ public class GroupsData {
 		}
 		
 		System.out.println("It took "+ (System.currentTimeMillis()-t0)/1000.0+" whith "+matches+" matches");
-		// Ahora tenemos que hacer la proyección
+		// Ahora tenemos que hacer la proyecciï¿½n
 		if (bubbles.size() > 0) {
 			doProjection();
 			buildGraphFromProjection();
 		} else
 			throw new IOException("No groups found");
+		
 		if(matches!=genes.size())
 			{
 			SwingUtilities.invokeLater(new Runnable(){
@@ -293,7 +301,7 @@ public class GroupsData {
 
 	// Build prefuse structure from bubbles projected with doProjection();
 	public void buildGraphFromProjection() {
-		// Añadimos todos los identificadores
+		// Aï¿½adimos todos los identificadores
 		nodes = new Table();
 		nodes.addColumn("id", int.class);
 		nodes.addColumn("genes", ArrayList.class);
@@ -368,7 +376,7 @@ public class GroupsData {
 	 * y de dos ficheros con los genes y condiciones de cada burbuja
 	 */
 	private void buildNodeTable(String bubbles, String genes, String conditions) {
-		// Añadimos todos los identificadores
+		// Aï¿½adimos todos los identificadores
 		nodes = new Table();
 		nodes.addColumn("id", int.class);
 		nodes.addColumn("genes", LinkedList.class);
@@ -416,8 +424,8 @@ public class GroupsData {
 	}
 
 	/**
-	 * Añade nuevas filas, correspondientes a otros ficheros de resultados. Se
-	 * distinguen unos de otros mediante la condición "resultType"
+	 * Aï¿½ade nuevas filas, correspondientes a otros ficheros de resultados. Se
+	 * distinguen unos de otros mediante la condiciï¿½n "resultType"
 	 */
 	private void addResults(String bubbles, String genes, String conditions) {
 		fsgn = new FileStructure(bubbles, ' ');
@@ -474,7 +482,7 @@ public class GroupsData {
 			if (i == 0) {
 				for (int j = 0; j < listag.size(); j++)
 					System.out.print(listag.get(j) + " ");
-				// System.out.println("Lista de tamaño "+listag.size());
+				// System.out.println("Lista de tamaï¿½o "+listag.size());
 			}
 			if (listag != null && listag.size() > 0 && listac != null
 					&& listac.size() > 0) {
@@ -496,7 +504,7 @@ public class GroupsData {
 		edges.addColumn("source", int.class);
 		edges.addColumn("target", int.class);
 		edges.addColumn("weight", int.class);
-		// A la larga, añadiendo un weightGenes y un weightConditions
+		// A la larga, aï¿½adiendo un weightGenes y un weightConditions
 
 		int row = 0;
 		int w = 0;
@@ -516,7 +524,7 @@ public class GroupsData {
 					row++;
 				}
 			}
-		// System.out.println("Número de aristas "+(row-1));
+		// System.out.println("Nï¿½mero de aristas "+(row-1));
 	}
 
 	/**

@@ -2672,7 +2672,7 @@ public class ExpressionData {
 							exp=re.eval("length(grep(\""+symbol+"\", listAttributes(martEnsembl)[,1]))");
 							}
 						
-						exp = RUtils.tryCatch("df<-getBMatts(group, mart=martEnsembl, type=\""+ rname+ "\", attributes=c(\"ensembl_gene_id\",\""+ rname+ "\",\"entrezgene\", \""+symbol+"\", \"description\"))$ids", re);
+								exp = RUtils.tryCatch("df<-getBMatts(group, mart=martEnsembl, type=\""+ rname+ "\", attributes=c(\"ensembl_gene_id\",\""+ rname+ "\",\"entrezgene_id\", \""+symbol+"\", \"description\"))$ids", re);
 						
 						if (!chip.equals(rname)) 
 						{
@@ -2697,10 +2697,10 @@ public class ExpressionData {
 						}
 						
 	
-						if (rname.equals("entrezgene")) {
+						if (rname.equals("entrezgene_id")) {
 							entrezs = geneNames.clone();
 						} else {
-							exp = re.eval("df[,\"entrezgene\"]");
+							exp = re.eval("df[,\"entrezgene_id\"]");
 							if (exp != null) {
 								int ints[] = exp.asIntArray();
 								ArrayList<String> strings = new ArrayList<String>();
@@ -3782,7 +3782,7 @@ public class ExpressionData {
 											// first three
 		else if (annotationType.equals("ensembl_gene_id"))
 			ga.setEnsemblId(annotation);
-		else if (annotationType.equals("entrezgene"))
+		else if (annotationType.equals("entrezgene_id"))
 			ga.setEntrezId(annotation);
 		else if (annotationType.equals("name"))
 			ga.setName(annotation);

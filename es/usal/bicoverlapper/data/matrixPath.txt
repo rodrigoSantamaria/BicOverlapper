@@ -1,1 +1,1 @@
-/Users/rodri/Documents/investigacion/distros/bicoverlapper1-4/data/scerevisiae/diauxic/diauDeRisi.txt
+/home/rodri/data/expression/prostate/GSE3325-edited.txt

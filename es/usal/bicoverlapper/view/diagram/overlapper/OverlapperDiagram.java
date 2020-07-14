@@ -109,7 +109,7 @@ private static final long serialVersionUID = 1L;
 	private JTextField[] muestraColor = new JTextField[paleta.length];
 	
 	
-	//Información propia de nuestro panel
+	//Informaciï¿½n propia de nuestro panel
 	public Overlapper bv;
 	JToolBar jtb;
 	JLabel found;
@@ -511,7 +511,7 @@ private static final long serialVersionUID = 1L;
 		}
 	}
 	/**
-	 * Esta clase implementa un gestor para add un anclaje a través del panel correspondiente en la ventana de configuracion.
+	 * Esta clase implementa un gestor para add un anclaje a travï¿½s del panel correspondiente en la ventana de configuracion.
 	 * 
 	 * @author Javier Molpeceres Ortego
 	 *
@@ -874,7 +874,7 @@ private static final long serialVersionUID = 1L;
 	public void endConfig(boolean ok){
 		if(!ok)	{configurando=false; return;}
 		
-		System.out.println("Opción "+thresholdOption+", "+value.getText());
+		System.out.println("Opciï¿½n "+thresholdOption+", "+value.getText());
 		float temp=new Float(value.getText()).floatValue();
 		if(temp!=thresholdValue)
 			{
@@ -952,9 +952,9 @@ private static final long serialVersionUID = 1L;
 						 }
 					 else
 						 {
-						 if(n.id<0)	
+						 //if(n.id<0)	
 							 id=sesion.getMicroarrayData().getConditionId(n.labelId);
-						 else				id=n.id;
+						 //else				id=n.id;
 						 conditions.add(id);
 						 }
 					 }

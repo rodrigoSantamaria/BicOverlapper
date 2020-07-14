@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Thu Feb 07 19:01:01 CET 2008
+onejar.license.required=true
+manifest.classpath=substance.jar core.jar .
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=GeneOverlapper_fat.jar
+manifest.mergeall=true
+manifest.mainclass=kernel.Prototipo
+manifest.file=Manifest.txt
+jarname.isextern=false
+onejar.expand=
+excludes=<po|BicOverlapper>~.settings/;<po|BicOverlapper>~.svn/;<po|BicOverlapper>~doc/;<po|BicOverlapper>~TRN.xml
+includes=

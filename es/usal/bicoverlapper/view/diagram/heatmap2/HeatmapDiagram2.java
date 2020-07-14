@@ -71,14 +71,14 @@ public class HeatmapDiagram2 extends Diagram {
 	// atributos de configuracion anclajes
 	DiagramWindow itemToAdd, itemToRemove;
 
-	// Información propia del heatmap
+	// Informaciï¿½n propia del heatmap
 	ExpressionData md;
 	CellHeatmap v; // Visualization
 	
 	int contName = 0;
 	int geneMargin = 100;
 	int conditionMargin = 100;
-	private double m_scale = 2 * 4; // OJOOO: Importantísimo: m_scale*rango debe
+	private double m_scale = 2 * 4; // OJOOO: Importantï¿½simo: m_scale*rango debe
 									// ser inexorablemente < 1, o salen escalas
 									// negativas y todo se va a la mierda
 	private int[] palette;
@@ -204,7 +204,7 @@ public class HeatmapDiagram2 extends Diagram {
 		for (int i = paletteTemp.length; i < palette.length; i++)
 			palette[i] = paletteTemp2[i - paletteTemp.length];
 
-		// en función del tipo de escala seleccionado se entrará por un camino u
+		// en funciï¿½n del tipo de escala seleccionado se entrarï¿½ por un camino u
 		// otro
 		if (session.getScaleMode() == Session.quantile) {
 		} else {

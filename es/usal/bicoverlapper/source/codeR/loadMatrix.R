@@ -14,11 +14,13 @@ loadMatrix=function(filePath=NULL, numEFs=0, duplicates="first")
 	#require(stringr)
 	
 	#Read file
+	print("Reading file...")
 	m=read.csv(filePath, sep="\t", header=FALSE)#, stringsAsFactors=FALSE)
 	colnames(m)=gsub("[ ]+$", "", as.character(unlist(m[1,])))
 	m=m[-1,]
 		
 	#Parse experimental factors
+	print("Parsing experimental factors...")
 	efs=c()
 	efvs=list()
 	if(numEFs>0)
@@ -31,6 +33,7 @@ loadMatrix=function(filePath=NULL, numEFs=0, duplicates="first")
 		}
 	
 	#Parse gene names and expression values
+	print("Parsing gene names and expression values...")
 	geneNames=gsub("[ ]+", "", as.character(m[,1]))
 	ann=gsub("^.*/", "", colnames(m)[1])
 	
@@ -40,6 +43,7 @@ loadMatrix=function(filePath=NULL, numEFs=0, duplicates="first")
 	rownames(m)=geneNames
 	
 	#NEW: produce average on unique rows?
+	print("Treating non-unique rows...")
 	dup=which(duplicated(geneNames))
 	if(duplicates=="average")
 		m=t(sapply(unique(geneNames), function(x)
@@ -68,6 +72,7 @@ loadMatrix=function(filePath=NULL, numEFs=0, duplicates="first")
 		}
 		
 	#Build ExpressionSet
+	print("Building ExpressionSet...")
 	if(is.null(efs)==FALSE)	
 		{
 		df=data.frame(efvs)

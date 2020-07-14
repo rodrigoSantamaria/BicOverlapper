@@ -16,11 +16,13 @@ getEnsemblMart=function(species="Homo sapiens")
 			specens=tolower(paste( substr(strsplit(species, " ")[[1]][1],0,1), strsplit(species, " ")[[1]][2], "_gene_ensembl", sep=""))
 	}
 	if(length(spec)==0)	stop("Species name is wrong")
-	if(species=="Schizosaccharomyces pombe" || length(grep("fuckeliana", species))>0)
+	if(species=="Schizosaccharomyces pombe" || length(grep("fuckeliana", species))>0  || length(grep("cinerea", species))>0)
 		{
-		marts=listMarts()[,"biomart"]
+		#marts=listMarts()[,"biomart"]
+	  #martName=as.character(marts[grep("fungi_mart", marts)[1]])
+	  marts=listMarts(host="fungi.ensembl.org")[,"biomart"]
 		martName=as.character(marts[grep("fungi_mart", marts)[1]])
-		mart = useMart(martName, dataset=paste(speclong,"_eg_gene",sep=""))
+		mart = useMart(martName, dataset=paste(speclong,"_eg_gene",sep=""), host="fungi.ensembl.org")
 		}
 	else
 		{

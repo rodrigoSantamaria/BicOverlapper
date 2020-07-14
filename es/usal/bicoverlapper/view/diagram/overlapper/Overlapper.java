@@ -43,7 +43,7 @@ import es.usal.bicoverlapper.utils.color.CustomColor;
  * graph layout. It manages force-directed layout, graph displaying and
  * parameter changes.
  * 
- * @author Roberto Therón & Rodrigo Santamaría
+ * @author Roberto Therï¿½n & Rodrigo Santamarï¿½a
  * 
  */
 public class Overlapper extends JProcessingPanel implements GeneRequester {
@@ -103,8 +103,8 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	float magnifierHeight;
 	float xTopMagnifier;
 	float yTopMagnifier;
-	float factor = 0.1f;// Factor de la magnificaci—n (10% del ‡rea total)
-	float areaInc = 2.0f;// Este hay que ir multiplicándolo y dividir por lo
+	float factor = 0.1f;// Factor de la magnificaciï¿½n (10% del ï¿½rea total)
+	float areaInc = 2.0f;// Este hay que ir multiplicï¿½ndolo y dividir por lo
 							// mismo que se multiplique esto el factor
 	int maxArea = 16;
 	float xTopDrawingRect;
@@ -159,8 +159,8 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	boolean additionMode = false;
 	boolean drawAwarded = true; // Se le puede hacer un toggle
 	boolean drawGlyphs = true; // Se le puede hacer un toggle
-	boolean fullDrawing = false; // Para imprimir la imagen entera sin ceñirnos
-									// a los márgenes de la ventana (para fotos)
+	boolean fullDrawing = false; // Para imprimir la imagen entera sin ceï¿½irnos
+									// a los mï¿½rgenes de la ventana (para fotos)
 	int[] priorities = new int[] { Graph.EDGE, Graph.HULL, Graph.HULLLABEL,
 			Graph.ZONE, Graph.PIECHART, Graph.NODE, Graph.NODELABEL,
 			Graph.SELECT, Graph.HOVER, Graph.SEARCH, Graph.ERROR, Graph.DUAL,
@@ -251,7 +251,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	boolean onlyGenes = false;
 	boolean computeDualLayout = true;
 
-	GraphPoint2D vf = new GraphPoint2D();// Vector para la aplicación de fuerzas
+	GraphPoint2D vf = new GraphPoint2D();// Vector para la aplicaciï¿½n de fuerzas
 											// en el layout
 
 	float memory; // Cantidad de memoria que nos queda
@@ -417,11 +417,11 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 			screenWidth = w;
 			screenHeight = h;
 		}
-		// size(screenWidth,screenHeight);//Sólo en caso de usarlo desde el
+		// size(screenWidth,screenHeight);//Sï¿½lo en caso de usarlo desde el
 		// panel, el P3D parece dar problemas
-		// size(screenWidth,screenHeight,P3D);//TODO: Sólo en caso de usarlo
+		// size(screenWidth,screenHeight,P3D);//TODO: Sï¿½lo en caso de usarlo
 		// desde el panel, el P3D parece dar problemas
-		// size(screenWidth,screenHeight,OPENGL);//Sólo en caso de usarlo desde
+		// size(screenWidth,screenHeight,OPENGL);//Sï¿½lo en caso de usarlo desde
 		// el panel, el P3D parece dar problemas
 		// Overview
 		float xob = xTopOverviewBox;
@@ -462,13 +462,13 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 				backBuffer.flush();
 				backBuffer = null;
 			}
-			// Invalidamos el contexto gráfico antiguo
+			// Invalidamos el contexto grï¿½fico antiguo
 			if (gr != null) {
 				gr.dispose();
 				gr = null;
 			}
 
-			// Creamos una nueva imagen con el tamaño apropiado
+			// Creamos una nueva imagen con el tamaï¿½o apropiado
 			if (backBuffer == null && this.getWidth() > 0
 					&& this.getHeight() > 0) {
 				//backBuffer = createImage(this.getWidth(), this.getHeight());
@@ -479,7 +479,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 
 			if (gr != null && backBuffer != null) {
 				// Establecemos las opciones de rendering y antialiasing de la
-				// gráfica
+				// grï¿½fica
 				RenderingHints qualityHints = new RenderingHints(null);
 				if (antialias)
 					qualityHints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -502,7 +502,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 				
 				pushMatrix();
 				translate(offsetX, offsetY);
-				scale(zoomFactor); // TODO: probando todavía
+				scale(zoomFactor); // TODO: probando todavï¿½a
 				this.g.draw(priorities);
 				popMatrix();
 				iteracion++;
@@ -516,7 +516,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 				}
 
 				// Almaceno la imagen actual como una imagen estable sobre la
-				// que hacer los pequeños cambios (sólo las líneas están en
+				// que hacer los pequeï¿½os cambios (sï¿½lo las lï¿½neas estï¿½n en
 				// dicha imagen)
 				img = createImage(backBuffer.getSource());
 				// Intercambio la imagen (rendering de doble buffer)
@@ -609,7 +609,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 					 * antRatioError=ratioError;
 					 */
 					if (!pauseSimulation) {
-						// System.out.println(iteracion+": Tasa de error: "+ratioError+" y área media "+this.g.getAverageNormArea()+" t de corrección "+(end-start));
+						// System.out.println(iteracion+": Tasa de error: "+ratioError+" y ï¿½rea media "+this.g.getAverageNormArea()+" t de correcciï¿½n "+(end-start));
 						System.out.println(iteracion + ": RE " + ratioError
 								+ "\tAM " + this.g.getAverageNormArea()
 								+ "\tAR " + areaError);
@@ -772,13 +772,13 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	 * are attracted by a Spring force 2) Every node is repulsed by every other
 	 * node by a Gravitational force
 	 */
-	// Ahora en está mal hecho, ya que se aplican las fuerzas antes de asegurar
+	// Ahora en estï¿½ mal hecho, ya que se aplican las fuerzas antes de asegurar
 	// que todas las fuerzas se le
 	// han aplicado, pero quiero ver si eso afecta sustancialmente, ya que si no
-	// lo hace en una iteración lo hace para la
+	// lo hace en una iteraciï¿½n lo hace para la
 	// siguiente, ganamos tiempo (la ganancia es poco importante no obstante) y,
 	// sobre todo, tengo todo preparado para aplicar
-	// métricas de manera particular
+	// mï¿½tricas de manera particular
 	public synchronized void doLayout() {
 		if (computeDualLayout && g.dualNodes != null && g.dualNodes.size() > 0) 
 			{
@@ -890,21 +890,21 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 				pauseSimulation=true;
 			}
 		}
-		n.setForce(nullVector); // una vez cambiada la posición, estas fuerzas
-								// ya no actúan sobre el nodo
+		n.setForce(nullVector); // una vez cambiada la posiciï¿½n, estas fuerzas
+								// ya no actï¿½an sobre el nodo
 		if (g.dualNodes != null && g.dualNodes.size() > 0) {
 			g.refreshDualPositions();
 		}
 	}
 
-	// Variación del anterior.
-	// Ahora en está mal hecho, ya que se aplican las fuerzas antes de asegurar
+	// Variaciï¿½n del anterior.
+	// Ahora en estï¿½ mal hecho, ya que se aplican las fuerzas antes de asegurar
 	// que todas las fuerzas se le
 	// han aplicado, pero quiero ver si eso afecta sustancialmente, ya que si no
-	// lo hace en una iteración lo hace para la
+	// lo hace en una iteraciï¿½n lo hace para la
 	// siguiente, ganamos tiempo (la ganancia es poco importante no obstante) y,
 	// sobre todo, tengo todo preparado para aplicar
-	// métricas de manera particular
+	// mï¿½tricas de manera particular
 	public synchronized void doSugiyamaLayout() {
 		Iterator<GroupSet> itGraph = g.getResults().values().iterator();// Hull
 																		// drawing
@@ -1057,13 +1057,13 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 																		// los
 																		// individuos
 																		// de la
-																		// población
+																		// poblaciï¿½n
 																		// mutan,
 																		// en x
 																		// o en
 																		// y (el
 																		// *2)
-		int mutFactor = 20;// la variación es de un valor aleatorio en [-10,10]
+		int mutFactor = 20;// la variaciï¿½n es de un valor aleatorio en [-10,10]
 							// pixeles
 		GraphGeneticAlgorithm gag = new GraphGeneticAlgorithm(numPop,
 				numParents, numMutant, mutFactor, 0, 0, 0, this.g);
@@ -1127,7 +1127,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 
 				}
 			}
-			// System.out.println("Fuerza de repulsión para "+n.label+": "+n.getForce().getX()+", "+n.getForce().getY());
+			// System.out.println("Fuerza de repulsiï¿½n para "+n.label+": "+n.getForce().getX()+", "+n.getForce().getY());
 
 			boolean zoomed = false;
 
@@ -1169,8 +1169,8 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 					//System.out.println("out of area");
 				}
 			}
-			n.setForce(nullVector); // una vez cambiada la posición, estas
-									// fuerzas ya no actúan sobre el nodo
+			n.setForce(nullVector); // una vez cambiada la posiciï¿½n, estas
+									// fuerzas ya no actï¿½an sobre el nodo
 		}// for (each node)
 
 		//this.pauseSimulation=true;
@@ -1224,7 +1224,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		float l = overviewBoxLength;
 		float h = overviewBoxHeight;
 
-		// Cambia la posición y tamaño de la lupa
+		// Cambia la posiciï¿½n y tamaï¿½o de la lupa
 		xTopMagnifier = X + (x / (m / n)) + (l / m) * (m - n) / 2;
 		yTopMagnifier = Y + (y / (m / n)) + (h / m) * (m - n) / 2;
 
@@ -1523,10 +1523,10 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		totalWidth -= f * totalWidth;
 		zoomFactor += f;
 
-		// Sincroniza pantalla peque–a con grande, pero no deja exactamente en
-		// el mismo sitio en el que estaba la visualizaci—n
+		// Sincroniza pantalla pequeï¿½a con grande, pero no deja exactamente en
+		// el mismo sitio en el que estaba la visualizaciï¿½n
 		xTopMagnifier -= f * (xTopOverviewBox - xTopMagnifier);// El secreto
-																// est‡ en c—mo
+																// estï¿½ en cï¿½mo
 																// modificar
 																// xTop/yTop
 																// correctamente...
@@ -1617,7 +1617,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 			return;
 		}
 
-		// Sólo funciona fuera del área de overview
+		// Sï¿½lo funciona fuera del ï¿½rea de overview
 		// lo pasamos al release
 		if (mouseX < this.xTopOverviewBox || mouseY > this.yTopOverviewBox) {
 			float xpress = (mouseX - offsetX) / zoomFactor;
@@ -1648,9 +1648,9 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	}
 
 	/**
-	 * Método para que cuando el cursor salga de la ventana, se deseleccione todo y no se mantenga repintado como si estuviera el cursor encima.
-	 * Si esto ocurre sería una situación errónea, ya que es falso que el cursor siga encima.
-	 * Esto ocurría al cambiar de ventana y al salir por un borde de la aplicación desde un polígono seleecionado.
+	 * Mï¿½todo para que cuando el cursor salga de la ventana, se deseleccione todo y no se mantenga repintado como si estuviera el cursor encima.
+	 * Si esto ocurre serï¿½a una situaciï¿½n errï¿½nea, ya que es falso que el cursor siga encima.
+	 * Esto ocurrï¿½a al cambiar de ventana y al salir por un borde de la aplicaciï¿½n desde un polï¿½gono seleecionado.
 	 */
 	protected void mouseExited(){
 		g.getHoverClusters().clear();
@@ -2027,7 +2027,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 					g.getDragNode().setY(ypress);
 					if (drawDual)
 						((DualNode) g.getDragNode()).positionSubNodes();
-				} else // Selecci—n de ‡rea
+				} else // Selecciï¿½n de ï¿½rea
 				{
 					if(selectionArea!=null)	selectionArea.add(new Point2D.Double(xpress, ypress));
 				}
@@ -2276,12 +2276,16 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 				l++;
 				System.out.println("columns: "+data[l]);
 				dataToken = data[l].split(delimiter); // Columnas
-				if (dataToken.length > 1) {
-					if (!onlyGenes) {
+				//if (dataToken.length > 1) {
+				if (dataToken.length > 0) {
+						if (!onlyGenes) {
 						for (int i = 0; i < dataToken.length; i++) {
-							lista.add(dataToken[i]);
-							if (!conditionNames.contains(dataToken[i]))
-								conditionNames.add(dataToken[i]);
+							if(dataToken[i].length()>0)
+								{
+								lista.add(dataToken[i]);
+								if (!conditionNames.contains(dataToken[i]))
+									conditionNames.add(dataToken[i]);
+								}
 						}
 					}
 				}
@@ -2395,7 +2399,9 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		boolean skipNext = false;
 		for (int l = 1; l < data.length; l++) {
 			dataToken = data[l].split(delimiter);
-			if (!skipNext && (data[l].length() > 0 && dataToken.length == 1)) {
+			if (!skipNext && (data[l].length() > 0 && dataToken.length == 1 && (l==1 || (l-1)%3==1))) {
+			//if (!skipNext && (data[l].length() > 0 && dataToken.length == 1)) {
+					System.out.println("Adding result set:"+ l);
 				resultLabels.add(dataToken[0]);
 				if (n != 0) {
 					resultSets.add(n / 3);
@@ -2425,7 +2431,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 
 	/**
 	 * Reads a file with groups entered with the following structure: element1
-	 * element2 ... elementN It´s equivalent to call to readFile(" ", null)
+	 * element2 ... elementN Itï¿½s equivalent to call to readFile(" ", null)
 	 * 
 	 * @param groupDelimiter
 	 * @param delimiter
@@ -2603,7 +2609,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		System.out.println("Tenemos " + numClusters + " clusters");
 		removeByThreshold();
 		System.out.println("No solapados tenemos " + numClusters);
-		RadialCluster[] clu = orderRadialClusters();// Añade un campo orden a
+		RadialCluster[] clu = orderRadialClusters();// Aï¿½ade un campo orden a
 													// cada cluster
 
 		// Uniform distribution of clusters
@@ -2611,7 +2617,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		double clustersPerRow = Math.ceil(Math.sqrt(numClusters));
 
 		float e = totalWidth * totalHeight / numClusters;
-		while (e < 100000 && areaInc < maxArea)// Espacio mínimo que quiero que
+		while (e < 100000 && areaInc < maxArea)// Espacio mï¿½nimo que quiero que
 												// tenga cada cluster
 		{
 			increaseOverview(2);
@@ -2637,16 +2643,16 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 
 			double row = Math.floor(o / clustersPerRow);
 			double col = Math.floor(o % clustersPerRow);
-			// System.out.println("Orden "+o+" posición "+row+", "+col);
+			// System.out.println("Orden "+o+" posiciï¿½n "+row+", "+col);
 
 			y = screenHeight * (areaInc - 1) / 2 + col * cellHeight
 					+ cellHeight / 2;
 			if (row % 2 == 0)
 				x = screenWidth * (areaInc - 1) / 2 + row * cellWidth
-						+ cellWidth / 2; // dirección ->
+						+ cellWidth / 2; // direcciï¿½n ->
 			else
 				x = screenWidth * (areaInc - 1) / 2 + screenWidth - row
-						* cellWidth - cellWidth / 2; // dirección <-
+						* cellWidth - cellWidth / 2; // direcciï¿½n <-
 			GraphPoint2D randomPos = new GraphPoint2D(x, y);
 			c.getCenterNode().setPosition(randomPos);
 			float radio = 5 * c.getNodes().size();
@@ -2685,16 +2691,16 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		System.out.println("Tenemos " + numClusters + " clusters");
 		removeByThreshold();
 		System.out.println("No solapados tenemos " + numClusters);
-		MaximalCluster[] clu = orderClusters();// Añade un campo orden a cada
+		MaximalCluster[] clu = orderClusters();// Aï¿½ade un campo orden a cada
 												// cluster
 
 		// Uniform distribution of clusters
 		double cellWidth, cellHeight;// Screen initial areas for each cluster
 		double clustersPerRow = Math.ceil(Math.sqrt(numClusters));
-		System.out.println("Cuadrícula de " + clustersPerRow);
+		System.out.println("Cuadrï¿½cula de " + clustersPerRow);
 
 		float e = totalWidth * totalHeight / numClusters;
-		while (e < 100000 && areaInc < maxArea)// Espacio mínimo que quiero que
+		while (e < 100000 && areaInc < maxArea)// Espacio mï¿½nimo que quiero que
 												// tenga cada cluster
 		{
 			increaseOverview(2);
@@ -2725,10 +2731,10 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 					+ cellHeight / 2;
 			if (row % 2 == 0)
 				x = screenWidth * (areaInc - 1) / 2 + row * cellWidth
-						+ cellWidth / 2; // dirección ->
+						+ cellWidth / 2; // direcciï¿½n ->
 			else
 				x = screenWidth * (areaInc - 1) / 2 + screenWidth - row
-						* cellWidth - cellWidth / 2; // dirección <-
+						* cellWidth - cellWidth / 2; // direcciï¿½n <-
 
 			GraphPoint2D randomPos = new GraphPoint2D(x, y);
 
@@ -2758,7 +2764,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		System.out.println("Ordering clusters");
 
 		int[] list = reorderClusters();
-		System.out.println("La lista de ordenación tiene " + list.length);
+		System.out.println("La lista de ordenaciï¿½n tiene " + list.length);
 		MaximalCluster[] cl = new MaximalCluster[list.length];
 		Iterator<GroupSet> itOrder = g.getResults().values().iterator();
 		int cont = 0;
@@ -2868,7 +2874,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	void removeByThreshold() {
 		System.out
 				.println("REMOVE NON OVERLAPPED -----------------------------");
-		System.out.println("Nº de clusters " + clusters.size());
+		System.out.println("Nï¿½ de clusters " + clusters.size());
 		int[] list = overlapList();
 		System.out.println("Tenemos una lista de " + list.length);
 
@@ -2896,7 +2902,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 
 		// Para cada uno de ellos, eliminamos sus nodos,
 		// los eliminamos de la lista clusters y disminuimos
-		// el número de clusters del resultSet.
+		// el nï¿½mero de clusters del resultSet.
 		for (int i = 0; i < clustersToRemove.size(); i++) {
 			int pos = (Integer) (posToRem.get(i)).intValue();
 			MaximalCluster c = (MaximalCluster) clustersToRemove.get(i);
@@ -2907,18 +2913,18 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 				Node nr = (Node) lista.get(k);
 				boolean toRemove = true;
 				if (threshold > 0) {// Tenemos que comprobar que no quitamos un
-									// nodo que está en otros clusters
-									// TODO: No sé si es mejor dejar el nodo con
-									// la información de que pertenece a varios
-									// clusters o quitarla también
+									// nodo que estï¿½ en otros clusters
+									// TODO: No sï¿½ si es mejor dejar el nodo con
+									// la informaciï¿½n de que pertenece a varios
+									// clusters o quitarla tambiï¿½n
 					Iterator itRNO = g.getResults().values().iterator();
 					while (itRNO.hasNext()) {
 						GroupSet r = (GroupSet) itRNO.next();
 						for (int m = 0; m < r.getClusters().size(); m++)// Si el
 																		// nodo
-																		// está
+																		// estï¿½
 																		// en
-																		// algún
+																		// algï¿½n
 																		// otro
 																		// cluster
 						{
@@ -2937,7 +2943,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 				}
 				if (toRemove) {
 					nodesToRemove.add(nr);
-					g.getNodes().remove(nr.getLabel());// y a sí mismo
+					g.getNodes().remove(nr.getLabel());// y a sï¿½ mismo
 				}
 			}
 
@@ -2985,7 +2991,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	 */
 	void removeNonSelected(Selection bs) {
 		// System.out.println("REMOVE non Selected -----------------------------");
-		// System.out.println("Nº de clusters "+clusters.size());
+		// System.out.println("Nï¿½ de clusters "+clusters.size());
 		int[] list = selectionList(bs);
 		// System.out.println("Tenemos una lista de "+list.length);
 
@@ -3013,10 +3019,10 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		}
 		System.out.println("Clusters to hide: " + clustersToRemove.size());
 
-		// Para cada uno de ellos, eliminamos sus nodos sólo si no
-		// están en ningún bicluster que esté seleccionado
+		// Para cada uno de ellos, eliminamos sus nodos sï¿½lo si no
+		// estï¿½n en ningï¿½n bicluster que estï¿½ seleccionado
 		// los eliminamos de la lista clusters y disminuimos
-		// el número de clusters del resultSet.
+		// el nï¿½mero de clusters del resultSet.
 
 		for (int i = 0; i < clustersToRemove.size(); i++)// Para cada cluster a
 															// quitar
@@ -3030,14 +3036,14 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 			{
 				Node nr = (Node) lista.get(k);
 				Map<String, Group> map = nr.clusters;// cogemos los clusters en
-														// los que está
+														// los que estï¿½
 				boolean toRemove = true;
 				for (int j = 0; j < list.length; j++) {
 					if (list[j] > 0) // si para alguno de los clusters que se
 										// queda
 					{
 						if (map.containsKey("cluster" + j)
-								&& !c.label.equals("cluster" + j))// está este
+								&& !c.label.equals("cluster" + j))// estï¿½ este
 																	// nodo
 						{
 							toRemove = false; // lo dejamos
@@ -3045,11 +3051,11 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 						}
 					}
 				}
-				if (toRemove) // se quita solo si no está en algún cluster
+				if (toRemove) // se quita solo si no estï¿½ en algï¿½n cluster
 								// seleccionado
 				{
 					nodesToRemove.add(nr);
-					g.getNodes().remove(nr.getLabel());// y a sí mismo
+					g.getNodes().remove(nr.getLabel());// y a sï¿½ mismo
 				}
 			}
 			edgesToRemove.addAll(c.removeEdges());
@@ -3103,7 +3109,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 																				// a
 																				// ver
 																				// si
-																				// está
+																				// estï¿½
 																				// en
 																				// un
 																				// sentido
@@ -3150,7 +3156,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 		}
 
 		insertDetails();
-		Runtime.getRuntime().gc();// Al final del constructor quizás sea buena
+		Runtime.getRuntime().gc();// Al final del constructor quizï¿½s sea buena
 									// idea
 		g.buildCompleteDualGraph();
 		// g.buildDualGraph();
@@ -3227,12 +3233,12 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 			clusters = null;
 			resultSets = null;
 		}
-		Runtime.getRuntime().gc();// Al final del constructor quizás sea buena
+		Runtime.getRuntime().gc();// Al final del constructor quizï¿½s sea buena
 									// idea
 	}
 
 	/**
-	 * Método para crear un caso de resultados de biclustering
+	 * Mï¿½todo para crear un caso de resultados de biclustering
 	 * 
 	 * @return
 	 */
@@ -3264,7 +3270,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 			// New ResultSet
 			r = new GroupSet();
 			r.setLabel((String) resultLabels.get(i));
-
+			System.out.println("Result set "+r.label);
 			r.setColor(new CustomColor(paleta[color++]));
 
 			r.setGraph(g);
@@ -3355,7 +3361,7 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	}
 
 	/**
-	 * Método para crear un caso de resultados de biclustering
+	 * Mï¿½todo para crear un caso de resultados de biclustering
 	 * 
 	 * @return
 	 */
@@ -3443,8 +3449,8 @@ public class Overlapper extends JProcessingPanel implements GeneRequester {
 	// ----------------------------- GETTERS AND SETTERS
 	// ------------------------------
 	/*
-	 * TODO: Muchos de estos parámetros, aunque están en biclusVis, hay que
-	 * asegurar que se usan más en esta clase que en las inferiores
+	 * TODO: Muchos de estos parï¿½metros, aunque estï¿½n en biclusVis, hay que
+	 * asegurar que se usan mï¿½s en esta clase que en las inferiores
 	 */
 
 	/**

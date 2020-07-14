@@ -264,14 +264,14 @@ filterclust=function(bics, overlapThreshold=0.25, maxNumber=100, maxRows=100, ma
 			{
 			#print(paste("size", length(i@rows), length(i@cols)))
 			insert=FALSE
-			}
+		}
 		if(insert)
 			for(j in bics2)
 			{
 				#print(paste("overlap:", overlap(i,j)))
 				if(overlap(i,j)>=overlapThreshold)
 				{
-					#print("filter out")
+					print("filter out")
 					insert=FALSE
 					break
 				}
@@ -293,4 +293,69 @@ overlap=function(bic1,bic2)
 	length(intersect(bic1@rows,bic2@rows))/length(bic1@rows)*length(intersect(bic1@cols,bic2@cols))/length(bic1@cols)	
 }
 
+#Writes biclusters results from a list of objects of type 'bicluster'. Row and column names are provided by a matrix object mat
+writeclust2=function(bic, mat,path, summary="Bicluster results")
+{
+  fileConn<-file(path)
+  lines=c(length(bic), summary)
+  cont=0
+  for(i in bic)
+    {
+    entry=paste("B", cont, ":", length(i@rows), "\t", length(i@cols), sep="", collapse="")
+    genes=paste(rownames(mb2)[i@rows], collapse="\t")
+    conds=paste(colnames(mb2)[i@cols], collapse="\t")
+    lines=c(lines, entry, genes, conds)
+    cont=cont+1
+    }
+  writeLines(lines, fileConn)
+  close(fileConn)
+}
+
+
+#Writes biclusters results from a list of rows and conditions for each group
+writeclust3=function(rows, cols=NA,path, summary="Bicluster results")
+{
+  fileConn<-file(path)
+  lines=c(length(rows), summary)
+  if(is.na(cols)[1])
+    {
+    cols=list()
+    for(i in c(1:length(rows)))
+      cols[[i]]=list()
+    }
+  cont=0
+  for(i in c(1:length(rows)))
+  {
+    if(is.null(names(rows)))
+      entry=paste("B", cont, ":", length(rows[[i]]), "\t", length(cols[[i]]), sep="", collapse="")
+    else
+      entry=paste(names(rows)[i], ":", length(rows[[i]]), "\t", length(cols[[i]]), sep="", collapse="")
+    genes=paste(rows[[i]], collapse="\t")
+    conds=paste(cols[[i]], collapse="\t")
+    lines=c(lines, entry, genes, conds)
+    cont=cont+1
+  }
+  writeLines(lines, fileConn)
+  close(fileConn)
+}
+
+
+readclust=function(path)
+{
+  setClass("bicluster", representation(rows="list", cols="list"))
+  bc=list()
+  
+  fileConn=file(path)
+  lines=readLines(fileConn)
+  
+  for(i in seq(3,length(lines),3))
+    {
+    b=new("bicluster")
+    b@rows=strsplit(lines[[i+1]], "\t")
+    b@cols=strsplit(lines[[i+2]], "\t")
+    bc=c(bc, b)
+  }
+  
+  bc
+}
 

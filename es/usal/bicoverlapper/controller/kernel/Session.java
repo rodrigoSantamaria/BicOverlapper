@@ -95,8 +95,8 @@ public class Session implements KeyListener{//, FocusListener {
 
 	private boolean cambioGenes;
 	private boolean cambioTRNGenes;
-	private Vector<Double> expresionesCondicion; // Niveles de expresión de una
-													// determinada condición
+	private Vector<Double> expresionesCondicion; // Niveles de expresiï¿½n de una
+													// determinada condiciï¿½n
 													// seleccionada (en el
 													// heatmap)
 
@@ -118,7 +118,7 @@ public class Session implements KeyListener{//, FocusListener {
 	private int numVentanaKegg = 1;
 	private int numVentanas = 1;
 
-	private int numColores = 0; // Número de colores que se han ido añadiendo
+	private int numColores = 0; // Nï¿½mero de colores que se han ido aï¿½adiendo
 								// con BiclusVis (aka el Overlapper)
 
 	private static final int xOffset = 30, yOffset = 30;
@@ -167,7 +167,7 @@ public class Session implements KeyListener{//, FocusListener {
 	public static int MAX_GENES = 1000;
 
 	// variable para indicar si la escala seleccionada son los cuantiles o es
-	// numérica
+	// numï¿½rica
 	public static final int numerical = 0;
 	public static final int quantile = 1;
 	//private int scaleMode = quantile;
@@ -433,7 +433,7 @@ public class Session implements KeyListener{//, FocusListener {
 				this.setWordCloud(ventana);
 
 				// este atributo se pone a false manualmente porque al hacer el
-				// setIndices se pone a true cuando no debería ser así
+				// setIndices se pone a true cuando no deberï¿½a ser asï¿½
 				panelWC.setInnerCall(false);
 
 				break;
@@ -613,7 +613,7 @@ public class Session implements KeyListener{//, FocusListener {
 	}
 
 	/**
-	 * Añade la ventana pasada como parametro al grupo por defecto de
+	 * Aï¿½ade la ventana pasada como parametro al grupo por defecto de
 	 * actualizacion.
 	 * 
 	 * @param ventana
@@ -623,7 +623,7 @@ public class Session implements KeyListener{//, FocusListener {
 		this.grupoVentanasDefecto.add(ventana);
 	}
 
-	// actualizar las ventanas activas menos las uqe tengan por título
+	// actualizar las ventanas activas menos las uqe tengan por tï¿½tulo
 	/**
 	 * Updates all active DiagramWindows except the ones with the input name It
 	 * is usually used to not update the calling DiagramWindow
@@ -641,7 +641,7 @@ public class Session implements KeyListener{//, FocusListener {
 		}
 	}
 
-	// actualizar las ventanas activas menos las uqe tengan por título
+	// actualizar las ventanas activas menos las uqe tengan por tï¿½tulo
 	/**
 	 * Updates all active DiagramWindows except the ones with the input name It
 	 * is usually used to not update the calling DiagramWindow
@@ -1033,7 +1033,7 @@ public class Session implements KeyListener{//, FocusListener {
 	 * Se llama desde cualquier panel cuando se selecciona algo que sea un
 	 * bicluster (pudiendo ser un bicluster cosas sin condiciones o sin genes,
 	 * es decir, conjuntos de genes o de condiciones solamente) Para evitar
-	 * actualizaciones, noActualizar indicará que se deben actualizar todas las
+	 * actualizaciones, noActualizar indicarï¿½ que se deben actualizar todas las
 	 * ventanas menos las que contengan la cadena noActualizar
 	 */
 	/**
@@ -1113,7 +1113,7 @@ public class Session implements KeyListener{//, FocusListener {
 						selectedBic.getGenes()), new LinkedList<Integer>(
 						selectedBic.getConditions())));
 			} else {
-				// si entra por aquí es porque selectedBic es null, por tanto
+				// si entra por aquï¿½ es porque selectedBic es null, por tanto
 				// quiere decir que no hay nada seleccionado
 				selectionLog.add(null);
 			}

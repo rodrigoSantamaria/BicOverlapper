@@ -1,6 +1,8 @@
 package es.usal.bicoverlapper.controller.kernel;
 
 import java.awt.Dimension;
+import java.awt.DisplayMode;
+import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.io.IOException;
 
@@ -12,7 +14,8 @@ import java.io.IOException;
 public class Configuration {
 
 	private Dimension dimAplicacion = new Dimension(1300, 800);// 1000x600
-
+	//private DisplayMode dimAplicacion=null;
+	
 	private Dimension dimParallelCoordinatesWindow = new Dimension(900, 300);
 	private Dimension dimNetworkWindow = new Dimension(600, 430);
 	private Dimension dimHeatmapWindow = new Dimension(355, 610);// for 1280x800
@@ -64,13 +67,17 @@ public class Configuration {
 	public static final int KEGG_ID = 16;
 
 	public Configuration() {
-		// TODO: give values to dimensions depending on screen size
-		dimAplicacion = java.awt.Toolkit.getDefaultToolkit().getScreenSize();// user
-																				// screen
-																				// size
+		//dimAplicacion = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+		DisplayMode dm = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode();
+		
+		dimAplicacion=new Dimension(dm.getWidth(), dm.getHeight());
+		
 		Dimension dimDesktop = new Dimension(dimAplicacion.width
 				- marginExternalWindowWidth, dimAplicacion.height
 				- marginExternalWindowHeight);
+				
+		
+	
 		System.out.println("Screen size: " + dimDesktop.width + ", "
 				+ dimDesktop.height);
 		dimParallelCoordinatesWindow = new Dimension(

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/gishur_core.jar"/>
+	<classpathentry kind="lib" path="lib/gishur_x.jar"/>
+	<classpathentry kind="lib" path="lib/prefuse.jar"/>
+	<classpathentry kind="lib" path="lib/substance.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-export-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphics2d-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphicsio-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphicsio-emf-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphicsio-java-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphicsio-pdf-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphicsio-ps-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphicsio-svg-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphicsio-swf-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-graphicsio-tests-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-io-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-swing-2.0.3.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-util-2.0.2.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/freehep-xml-2.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/jas-plotter-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/jdom-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/junit-3.8.2.jar"/>
+	<classpathentry kind="lib" path="lib/vectorgraphics-2.1.1/lib/openide-lookup-1.9-patched-1.0.jar"/>
+	<classpathentry kind="lib" path="axis2-1.4/lib/mail-1.4.jar"/>
+	<classpathentry kind="lib" path="axis2-1.4/lib/wstx-asl-3.2.4.jar"/>
+	<classpathentry kind="lib" path="axis-1_4/lib/axis-ant.jar"/>
+	<classpathentry kind="lib" path="axis-1_4/lib/axis.jar"/>
+	<classpathentry kind="lib" path="axis-1_4/lib/commons-discovery-0.2.jar"/>
+	<classpathentry kind="lib" path="axis-1_4/lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="axis-1_4/lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="axis-1_4/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="axis-1_4/lib/saaj.jar"/>
+	<classpathentry kind="lib" path="axis-1_4/lib/wsdl4j-1.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/ols-client.jar"/>
+	<classpathentry kind="lib" path="lib/JRI.jar"/>
+	<classpathentry kind="lib" path="lib/forms-1.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/TableLayout.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Charly/Desktop/librerias KEGG/keggapi.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

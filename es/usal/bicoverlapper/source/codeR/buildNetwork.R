@@ -1,13 +1,13 @@
 # This method builds a co-regulation network from an expression matrix
 # gmlFile - path to a GML file where the network will be stored
-#Êmat - expression matrix
+#?mat - expression matrix
 # sdThreshold - rows with sd lower than this threshold will be discarded
 #				genes with deviation below averageDeviation+deviationThreshold*sdDeviaiton will be discarded 
 # distanceMethod - method to compute the distance. Anyone used by dist() can be chosen
 #					TODO: add "mutual information" as distance method
-#ÊdistanceThreshold - the method adds an edge for every two nodes with a distance lower
+#?distanceThreshold - the method adds an edge for every two nodes with a distance lower
 #					  than mean(distances)-distanceThreshold*sd(distances)
-# Author: Rodrigo Santamar’a Vicente
+# Author: Rodrigo Santamar?a Vicente
 ###############################################################################
 buildCorrelationNetwork0=function(gmlFile=NA, mat=NA, distanceMethod="euclidean", deviationThreshold=2, distanceThreshold=2)
 	{
@@ -22,7 +22,10 @@ buildCorrelationNetwork0=function(gmlFile=NA, mat=NA, distanceMethod="euclidean"
 	dt=mean(sds)+deviationThreshold*sd(sds)
 	mat0=mat[which(sds>dt),]
 	dim(mat0)
-	if(dim(mat0)[1]>2000)
+	print(c("Nodes considered: ", dim(mat0)[1]))
+	print(c("Min. value in nodes considered: ", min(rowSums(mat0))))
+	
+	if(dim(mat0)[1]>4000)#Temporarily set to 4000.
 		return("Error: networks with more than 2000 nodes are not allowed, rise up the filtering threshold")
 	
 	#1) Perform distance computations
@@ -68,10 +71,12 @@ buildCorrelationNetwork0=function(gmlFile=NA, mat=NA, distanceMethod="euclidean"
 		{
 		ids=which(rownames(mat0) %in% unique(c(ic,jc)))
 		names=unique(c(ic,jc))
-		writeGML(gmlFile=gmlFile, nodeids=ids, nodenames=names, edges=list(n1=ic, n2=jc))
+		#writeGML(gmlFile=gmlFile, nodeids=ids, nodenames=names, edges=list(n1=ic, n2=jc))
+		writeGML(gmlFile=gmlFile, nodeids=names, edges=list(n1=ic, n2=jc))
 		rm(mat0,dm,dd)
-		return("Network built")
-		}
+		#return("Network built")
+		return(list(n1=ic, n2=jc))
+	  }
 	else
 		return(list(n1=ic, n2=jc))
 	}
@@ -139,6 +144,7 @@ buildCorrelationNetwork=function(gmlFile=NA, mat=NA, distanceMethod="euclidean",
 			{
 			ids=which(rownames(mat0) %in% unique(c(ic,jc)))
 			names=unique(c(ic,jc))
+		
 			writeGML(gmlFile=gmlFile, nodeids=ids, nodenames=names, edges=list(n1=ic, n2=jc))
 			rm(mat0,dm,dd)
 			return("Network built")
@@ -155,41 +161,66 @@ buildCorrelationNetwork=function(gmlFile=NA, mat=NA, distanceMethod="euclidean",
 #nodeids - integer array with node identifiers
 #nodenames - character array with node names (optional, if not provided, nodeids are taken as nodenames)
 #edges - list with two elements of equal length, n1 and n2, that are int lists of node ids
-writeGML=function(gmlFile=NA, nodeids, nodenames=NA, edges)
+#sizes - list of node sizes (optional)
+#values - a matrix of nodeids rows and columns with numerical values that will be stored separately as attributes with the name of the column
+writeGML=function(gmlFile=NA, nodeids, nodenames=NA, edges, sizes=NA, types=NA, values=NA)
 	{
-	if(length(nodenames)>0 && length(nodenames)==length(nodeids))	nodes=nodenames
-	else	nodes=nodeids
+	#if(length(nodenames)>0 && length(nodenames)==length(nodeids))	nodes=nodenames
+	#else	nodes=nodeids
 	if(length(edges)==0)	break
 	if(length(edges$n1)!=length(edges$n2)) break
-	
-	
-	
+	  
 	write(file=gmlFile, 
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 		<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"
 			xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
 			xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns
 			http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">
-		<key id=\"d0\" for=\"node\" attr.name=\"name\" attr.type=\"string\">
+		<key id=\"d0\" for=\"node\" attr.name=\"id\" attr.type=\"string\">
 			</key>
 			<key id=\"d1\" for=\"node\" attr.name=\"type\" attr.type=\"string\">
+			<default>node</default>
+			</key>
+			<key id=\"d2\" for=\"node\" attr.name=\"size\" attr.type=\"int\">
+			<default>1</default>
+      </key>
+		<key id=\"d3\" for=\"node\" attr.name=\"name\" attr.type=\"string\">
 			<default>unknown</default>
 			</key>
-			<key id=\"d2\" for=\"edge\" attr.name=\"type\" attr.type=\"string\">
-			</key>
-		<graph id=\"Gene Network\" edgedefault=\"undirected\">", append=FALSE)
-	for(i in 1:length(nodes))
+	", append=FALSE)
+	
+	if(is.na(values)==FALSE & length(values)==1)
+  	{
+  	sapply(colnames(values), function(x){ 
+  	  write(file=gmlFile, paste("<key id=\"", x,"\" for=\"node\" attr.name=\"type\" attr.type=\"string\">
+			</key>", sep=""))})  
+  	}
+	write(file=gmlFile,
+		"<graph id=\"Gene Network\" edgedefault=\"undirected\">", append=TRUE)
+	
+	for(i in 1:length(nodeids))
 		{
 		write(file=gmlFile, paste("	<node id=\"", (i), "\">", sep=""), append=TRUE)
-		write(file=gmlFile, paste("		<data key=\"d0\">",nodes[i],"</data>", sep=""), append=TRUE)
-		write(file=gmlFile, "		<data key=\"d1\">gene</data>", append=TRUE)
+		write(file=gmlFile, paste("		<data key=\"d0\">",nodeids[i],"</data>", sep=""), append=TRUE)
+		if(!is.na(types))
+		  write(file=gmlFile, paste("		<data key=\"d1\">",types[i],"</data>", sep=""), append=TRUE)
+		if(!is.na(sizes))
+		  write(file=gmlFile, paste("		<data key=\"d2\">",sizes[i],"</data>",sep=""), append=TRUE)
+		if(!is.na(names))
+		  write(file=gmlFile, paste("		<data key=\"d3\">",nodenames[i],"</data>",sep=""), append=TRUE)
+		if(is.na(values)==FALSE)
+		  sapply(colnames(values), function(x)
+		    {
+		    write(file=gmlFile, paste("		<data key=\"",x,"\">",values[i,x],"</data>",sep=""), append=TRUE)
+		    })
+		  
 		write(file=gmlFile, "	</node>", append=TRUE)
 	 	}
 			
 	for(i in 1:length(edges$n1))
 		{
-		write(file=gmlFile, paste("	<edge source=\"", (which(nodes %in% edges$n1[i])), "\" target=\"", (which(nodes %in% edges$n2[i])), "\">", sep=""), append=TRUE)
-		write(file=gmlFile, "		<data key=\"d2\">co-regulation</data>", append=TRUE)
+		write(file=gmlFile, paste("	<edge source=\"", (which(nodeids %in% edges$n1[i])), "\" target=\"", (which(nodeids %in% edges$n2[i])), "\">", sep=""), append=TRUE)
+		write(file=gmlFile, "		<data key=\"d3\">co-regulation</data>", append=TRUE)
 		write(file=gmlFile, "	</edge>", append=TRUE)
 		}
 	write(file=gmlFile, "</graph></graphml>", append=TRUE)
