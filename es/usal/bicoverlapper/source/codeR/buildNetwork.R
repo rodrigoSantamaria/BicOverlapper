@@ -169,14 +169,18 @@ writeGML=function(gmlFile=NA, nodeids, nodenames=NA, edges, sizes=NA, types=NA, 
 	#else	nodes=nodeids
 	if(length(edges)==0)	break
 	if(length(edges$n1)!=length(edges$n2)) break
-	  
+	
+  if(is.na(nodenames))  nodenames=rep("none", length(nodeids))
+  if(is.na(sizes))  sizes=rep(1, length(nodeids))
+  if(is.na(types))  types=rep("none", length(nodeids))
+  
 	write(file=gmlFile, 
 	"<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 		<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"
 			xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
 			xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns
 			http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">
-		<key id=\"d0\" for=\"node\" attr.name=\"id\" attr.type=\"string\">
+		<key id=\"d0\" for=\"node\" attr.name=\"name\" attr.type=\"string\">
 			</key>
 			<key id=\"d1\" for=\"node\" attr.name=\"type\" attr.type=\"string\">
 			<default>node</default>
@@ -184,7 +188,10 @@ writeGML=function(gmlFile=NA, nodeids, nodenames=NA, edges, sizes=NA, types=NA, 
 			<key id=\"d2\" for=\"node\" attr.name=\"size\" attr.type=\"int\">
 			<default>1</default>
       </key>
-		<key id=\"d3\" for=\"node\" attr.name=\"name\" attr.type=\"string\">
+		<key id=\"d3\" for=\"node\" attr.name=\"symbol\" attr.type=\"string\">
+			<default>unknown</default>
+			</key>
+		<key id=\"d4\" for=\"edge\" attr.name=\"type\" attr.type=\"string\">
 			<default>unknown</default>
 			</key>
 	", append=FALSE)
@@ -220,7 +227,7 @@ writeGML=function(gmlFile=NA, nodeids, nodenames=NA, edges, sizes=NA, types=NA, 
 	for(i in 1:length(edges$n1))
 		{
 		write(file=gmlFile, paste("	<edge source=\"", (which(nodeids %in% edges$n1[i])), "\" target=\"", (which(nodeids %in% edges$n2[i])), "\">", sep=""), append=TRUE)
-		write(file=gmlFile, "		<data key=\"d3\">co-regulation</data>", append=TRUE)
+		write(file=gmlFile, "		<data key=\"d4\">co-regulation</data>", append=TRUE)
 		write(file=gmlFile, "	</edge>", append=TRUE)
 		}
 	write(file=gmlFile, "</graph></graphml>", append=TRUE)

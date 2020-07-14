@@ -85,8 +85,8 @@ public class DataReader {
 		JDesktopPane desktop = sesion.getDesktop();
 
 		variable = in.readLine();
-		// En función de esto determinamos qué es:
-		// 1) Un fichero de tabla xml como los que usa Javi (usamos su método de
+		// En funciï¿½n de esto determinamos quï¿½ es:
+		// 1) Un fichero de tabla xml como los que usa Javi (usamos su mï¿½todo de
 		// lectura) a DatosFile
 		// 2) Un grafo xml de los que usamos nosotros, usamos nuestro parser a
 		// TRN Data
@@ -121,6 +121,7 @@ public class DataReader {
 			for (int i = 0; i < trnd.getGraph().getNodeCount(); i++) {
 				Node n = trnd.getGraph().getNode(i);
 				n.setInt("id", i);
+				//n.setString("id", ""+i);
 			}
 		}
 
