@@ -189,7 +189,7 @@ public class Analysis {
 				return;
 			}
 		}
-		System.out.println("R started");
+		System.out.println	("R started");
 		loadRscripts();
 		System.out.println("required R scripts loaded");
 	}
@@ -363,7 +363,7 @@ public class Analysis {
 				microarrayData.iqr = r.eval("iqr").asDoubleArray();
 
 				RList outliers = r.eval(
-						"as.array(sapply(1:dim(m)[2],function(x){c(which(m[,x]>q75[x]+ "
+						"as.array(lapply(1:dim(m)[2],function(x){c(which(m[,x]>q75[x]+ "
 								+ microarrayData.whiskerRange
 								+ "*iqr[x]),  which(m[,x]<q25[x]- "
 								+ microarrayData.whiskerRange + "*iqr[x]))}))")
