@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/gishur_core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/gishur_x.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/JRI.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/keggapi.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ols-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/prefuse.jar"/>
@@ -114,5 +113,8 @@
 	<classpathentry kind="lib" path="lib/axis2-1.4/lib/xmlbeans-2.3.0.jar"/>
 	<classpathentry kind="lib" path="lib/axis2-1.4/lib/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/axis2-1.4/lib/XmlSchema-1.4.2.jar"/>
+	<classpathentry kind="lib" path="lib/JRIEngine.jar"/>
+	<classpathentry kind="lib" path="lib/REngine.jar"/>
+	<classpathentry kind="lib" path="lib/JRI.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
